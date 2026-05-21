@@ -28,6 +28,36 @@
 
 ---
 
+## Session 2 — 2026-05-21
+**Agent:** Antigravity
+**Step:** Step 1 — Project scaffold
+**Status:** ✅ Complete
+
+### What Was Done
+- Scaffolded Next.js 15 project inside lowercase `wama-platform` (to bypass npm capitalization rules) and successfully shifted files to root.
+- Installed and configured Convex, Clerk, Anthropic SDK, and Lucide React.
+- Initialized shadcn/ui and migrated configurations and code to a flat, non-src folder structure.
+- Created `lib/copy.ts` for all UI copy dictionary mapping and `lib/constants.ts` for shared transaction enums.
+- Created `components/providers/convex-client-provider.tsx` wrapping the application in Convex + Clerk providers.
+- Integrated the latest Clerk v7 `<Show>` unified components for clean auth screening.
+- Implemented premium responsive `components/layout/sidebar.tsx` with amber gradients, interactive hover states, and UserButton settings.
+- Wrote full-featured mock-layouts for `/dashboard`, `/buyers`, `/sellers`, and `/matches` to deliver state-of-the-art visual styling.
+- Handled empty env variable checks at build-time using robust fallback Convex URL endpoints to prevent prerender errors.
+- Verified that `npm run build` compiles 100% cleanly without warnings.
+
+### Decisions Made
+- Flat structure: Re-mapped tsconfig/components configurations to drop `src/` to match `docs/internal/wama-tech-spec.md` architecture.
+- Clerk v7 unification: Used unified `<Show>` control components rather than deprecated `<SignedIn>`/`<SignedOut>` wrappers.
+- Safe Prerendering: Implemented build-time URL fallback for `ConvexReactClient` so developers/CI can build projects without populating `.env.local` first.
+
+### Open Questions / Blockers
+- None.
+
+### Next Steps
+- Start Step 2 — Buyer CRUD (Convex buyers schema mutations, list tab views, new buyer creation forms, profile edit cards).
+
+---
+
 ## Session 1 — 2026-05-20
 **Agent:** Antigravity
 **Step:** Pre-build — Documentation

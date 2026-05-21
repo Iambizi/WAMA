@@ -41,8 +41,8 @@ There are no buyer or seller logins in V0. William is the only user.
 > **Update this section at the start of each session.**
 
 ```
-Last completed step: [ ]
-Next step to build: [ Step 1 — Project scaffold ]
+Last completed step: [ Step 1 — Project scaffold ]
+Next step to build: [ Step 2 — Buyer CRUD ]
 Blockers: none
 ```
 
