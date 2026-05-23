@@ -28,6 +28,34 @@
 
 ---
 
+## Session 4 — 2026-05-23
+**Agent:** Antigravity
+**Step:** Step 3 — Seller CRUD
+**Status:** ✅ Complete
+
+### What Was Done
+- Implemented the full backend and frontend lifecycle for **Step 3 — Seller CRUD**:
+  - Implemented live Convex endpoints (`list`, `get`, `create`, `update`, `updateStatus`) inside `convex/sellers.ts` secured with `requireAdvisor`.
+  - Built automatic **Document Readiness Score** calculation logic (20% weight per checklist checkbox) storing the computed score (0-100%) in the database, with automatic action logging.
+  - Created reusable `components/sellers/seller-form.tsx` rendering mandate criteria, checklist switches, reason summaries, and private advisor remarks.
+  - Implemented `/sellers` list page with live Convex queries, filter tabs, client-side search, and readiness score progress bars.
+  - Created `/sellers/new` creation card layout.
+  - Created dynamic split-pane profile `/sellers/[id]` page displaying financial gauges, readiness gauges (rose/amber/emerald), checklists, remarks, and a slide-over edit criteria drawer overlay.
+  - Updated mock generated Convex schemas inside `convex/_generated/api.d.ts` to expose the new `sellers` endpoints.
+- Resolved all TypeScript compiler warnings and completed production Next.js build compilation with zero linter errors.
+
+### Decisions Made
+- **Storing Computed Score:** Storing the `readinessScore` directly in the database during creations and updates enables database-level search, indexing, and ordering optimizations.
+- **Dynamic Progress Theming:** Render HSL visual indicators representing low, medium, and qualified seller readiness (emerald green for Live Ready >= 80%).
+
+### Open Questions / Blockers
+- None.
+
+### Next Steps
+- Begin Step 4 — Dashboard and retroactively link all activity logs.
+
+---
+
 ## Session 3 — 2026-05-23
 **Agent:** Antigravity
 **Step:** Step 2 — Buyer CRUD & Type Declarations

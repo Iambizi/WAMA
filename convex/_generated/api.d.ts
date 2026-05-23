@@ -16,6 +16,7 @@ import type {
 } from "convex/server";
 import type * as activityLogs from "../activityLogs.js";
 import type * as buyers from "../buyers.js";
+import type * as sellers from "../sellers.js";
 
 /**
  * A utility for referencing Convex functions in your app's queries and mutations.
@@ -28,6 +29,7 @@ import type * as buyers from "../buyers.js";
 declare const fullApi: ApiFromModules<{
   activityLogs: typeof activityLogs;
   buyers: typeof buyers;
+  sellers: typeof sellers;
 }>;
 export declare const api: FilterApi<
   typeof fullApi,

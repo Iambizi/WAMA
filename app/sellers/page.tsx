@@ -2,41 +2,51 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Landmark, Search, Plus, Sparkles, ArrowUpDown } from "lucide-react";
+import { useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
+import { Landmark, Search, Plus, Sparkles, ArrowUpDown, Loader2 } from "lucide-react";
 import { COPY } from "@/lib/copy";
+import { SECTORS, REVENUE_RANGES } from "@/lib/constants";
 
 export default function Sellers() {
   const [activeTab, setActiveTab] = useState<"all" | "pending" | "qualified" | "disqualified">("all");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
 
-  // Mock list for scaffold rendering
-  const sellersList = [
-    {
-      id: "1",
-      businessName: "Boulangerie Artisanale Montreal",
-      sector: "Food & Beverage",
-      revenue: "$1.0M - $3.0M",
-      readinessScore: 80,
-      status: "qualified",
-    },
-    {
-      id: "2",
-      businessName: "Mandate #08 (Private Tech Firm)",
-      sector: "Technology & Software",
-      revenue: "$3.0M - $5.0M",
-      readinessScore: 40,
-      status: "pending",
-    },
-    {
-      id: "3",
-      businessName: "Metalworks Lanaudière",
-      sector: "Manufacturing",
-      revenue: "$5.0M - $10.0M",
-      readinessScore: 100,
-      status: "qualified",
-    },
-  ];
+  // Query Convex database
+  const sellersList = useQuery(api.sellers.list);
 
-  const filteredSellers = sellersList.filter(s => activeTab === "all" || s.status === activeTab);
+  // Loading state
+  const isLoading = sellersList === undefined;
+
+  // Filtered and searched sellers list
+  const filteredSellers = (sellersList || []).filter((seller) => {
+    const matchesTab = activeTab === "all" || seller.qualificationStatus === activeTab;
+    
+    const searchLower = searchQuery.toLowerCase();
+    const sectorLabel = SECTORS.find(x => x.value === seller.sector)?.label || seller.sector;
+    const matchesSearch = 
+      seller.businessName.toLowerCase().includes(searchLower) ||
+      seller.name.toLowerCase().includes(searchLower) ||
+      seller.email.toLowerCase().includes(searchLower) ||
+      (seller.phone || "").toLowerCase().includes(searchLower) ||
+      sectorLabel.toLowerCase().includes(searchLower);
+
+    return matchesTab && matchesSearch;
+  });
+
+  // Sorted list
+  const sortedSellers = [...filteredSellers].sort((a, b) => {
+    if (sortDirection === "asc") {
+      return a.createdAt - b.createdAt;
+    } else {
+      return b.createdAt - a.createdAt;
+    }
+  });
+
+  const toggleSortDirection = () => {
+    setSortDirection(prev => prev === "asc" ? "desc" : "asc");
+  };
 
   return (
     <div className="space-y-8">
@@ -75,7 +85,7 @@ export default function Sellers() {
                   : "text-zinc-400 hover:text-zinc-200"
               }`}
             >
-              {tab === "all" ? COPY.sellers.tabs.all : COPY.sellers.tabs[tab as keyof typeof COPY.sellers.tabs] || tab}
+              {tab === "all" ? COPY.sellers.tabs.all : COPY.sellers.tabs[tab]}
             </button>
           ))}
         </div>
@@ -86,11 +96,17 @@ export default function Sellers() {
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
             <input
               type="text"
-              placeholder="Search by mandate, sector, or criteria..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search by name, sector, owner, or criteria..."
               className="w-full pl-10 pr-4 py-2.5 bg-zinc-900/30 hover:bg-zinc-900/50 focus:bg-zinc-900 border border-zinc-900 focus:border-zinc-800 rounded-xl text-xs text-white placeholder-zinc-500 outline-none transition-all duration-300"
             />
           </div>
-          <button className="p-2.5 bg-zinc-900 border border-zinc-900 rounded-xl hover:border-zinc-800 text-zinc-400 hover:text-zinc-200 transition-all duration-300">
+          <button 
+            onClick={toggleSortDirection}
+            title={sortDirection === "asc" ? "Sort Oldest First" : "Sort Newest First"}
+            className="p-2.5 bg-zinc-900 border border-zinc-900 rounded-xl hover:border-zinc-800 text-zinc-400 hover:text-zinc-200 transition-all duration-300 flex items-center justify-center shrink-0"
+          >
             <ArrowUpDown className="h-4 w-4" />
           </button>
         </div>
@@ -98,7 +114,12 @@ export default function Sellers() {
 
       {/* Sellers Data Grid */}
       <div className="bg-zinc-900/30 border border-zinc-900 rounded-2xl overflow-hidden">
-        {filteredSellers.length > 0 ? (
+        {isLoading ? (
+          <div className="py-24 text-center space-y-4">
+            <Loader2 className="mx-auto h-8 w-8 animate-spin text-zinc-500" />
+            <p className="text-xs text-zinc-500">{COPY.common.loading}</p>
+          </div>
+        ) : sortedSellers.length > 0 ? (
           <div className="overflow-x-auto">
             <table className="w-full border-collapse text-left">
               <thead>
@@ -112,71 +133,83 @@ export default function Sellers() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-zinc-900/40 text-xs">
-                {filteredSellers.map((seller) => (
-                  <tr key={seller.id} className="hover:bg-zinc-900/10 transition-colors group">
-                    <td className="py-4.5 px-6 font-semibold text-zinc-200 group-hover:text-white">
-                      {seller.businessName}
-                    </td>
-                    <td className="py-4.5 px-6 text-zinc-400">
-                      {seller.sector}
-                    </td>
-                    <td className="py-4.5 px-6 font-medium text-zinc-300">
-                      {seller.revenue}
-                    </td>
-                    <td className="py-4.5 px-6">
-                      <div className="flex items-center gap-2.5">
-                        {/* Custom visual mini-progress-bar */}
-                        <div className="w-16 bg-zinc-800 h-1.5 rounded-full overflow-hidden">
-                          <div
-                            className={`h-full rounded-full ${
-                              seller.readinessScore >= 80 
-                                ? "bg-amber-400" 
-                                : seller.readinessScore >= 50 
-                                  ? "bg-yellow-500/80" 
-                                  : "bg-zinc-600"
-                            }`}
-                            style={{ width: `${seller.readinessScore}%` }}
-                          />
+                {sortedSellers.map((seller) => {
+                  const sectorLabel = SECTORS.find(x => x.value === seller.sector)?.label || seller.sector;
+                  const revenueLabel = REVENUE_RANGES.find(x => x.value === seller.revenueRange)?.label || seller.revenueRange;
+                  const readinessScore = seller.readinessScore ?? 0;
+
+                  return (
+                    <tr key={seller._id} className="hover:bg-zinc-900/10 transition-colors group">
+                      <td className="py-4.5 px-6 font-semibold text-zinc-200 group-hover:text-white">
+                        <div className="flex flex-col">
+                          <span>{seller.businessName}</span>
+                          <span className="text-[10px] text-zinc-500 font-normal">{seller.name}</span>
                         </div>
-                        <span className="text-[10px] font-bold text-zinc-400">
-                          {seller.readinessScore}%
-                        </span>
-                      </div>
-                    </td>
-                    <td className="py-4.5 px-6">
-                      <span
-                        className={`inline-flex items-center gap-1.5 px-2 py-1 text-[9px] font-bold uppercase tracking-wider rounded-md border ${
-                          seller.status === "qualified"
-                            ? "bg-emerald-500/5 text-emerald-400 border-emerald-500/10"
-                            : seller.status === "disqualified"
-                              ? "bg-rose-500/5 text-rose-400 border-rose-500/10"
-                              : "bg-zinc-800 text-zinc-400 border-zinc-800"
-                        }`}
-                      >
-                        {seller.status === "qualified" 
-                          ? "Qualified" 
-                          : seller.status === "disqualified" 
-                            ? "Disqualified" 
-                            : "Pending"}
-                      </span>
-                    </td>
-                    <td className="py-4.5 px-6 text-right">
-                      <div className="flex items-center justify-end gap-2">
-                        {seller.status === "qualified" && (
-                          <button className="p-1.5 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/20 hover:border-amber-500/30 text-amber-400 rounded-lg transition-all duration-300" title="Generate AI Matches">
-                            <Sparkles className="h-3.5 w-3.5 stroke-[2.2]" />
-                          </button>
-                        )}
-                        <Link
-                          href={`/sellers/${seller.id}`}
-                          className="inline-flex items-center gap-1 px-3 py-1.5 bg-zinc-900 border border-zinc-800 hover:border-zinc-700 hover:bg-zinc-800/80 rounded-lg text-[10px] font-bold text-zinc-300 transition-colors"
+                      </td>
+                      <td className="py-4.5 px-6 text-zinc-400">
+                        {sectorLabel}
+                      </td>
+                      <td className="py-4.5 px-6 font-medium text-zinc-300">
+                        {revenueLabel}
+                      </td>
+                      <td className="py-4.5 px-6">
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-16 bg-zinc-800 h-1.5 rounded-full overflow-hidden shrink-0">
+                            <div
+                              className={`h-full rounded-full ${
+                                readinessScore >= 80 
+                                  ? "bg-emerald-500" 
+                                  : readinessScore >= 50 
+                                    ? "bg-amber-500" 
+                                    : "bg-rose-500"
+                              }`}
+                              style={{ width: `${readinessScore}%` }}
+                            />
+                          </div>
+                          <span className="text-[10px] font-bold text-zinc-400">
+                            {readinessScore}%
+                          </span>
+                        </div>
+                      </td>
+                      <td className="py-4.5 px-6">
+                        <span
+                          className={`inline-flex items-center gap-1.5 px-2 py-1 text-[9px] font-bold uppercase tracking-wider rounded-md border ${
+                            seller.qualificationStatus === "qualified"
+                              ? "bg-emerald-500/5 text-emerald-400 border-emerald-500/10"
+                              : seller.qualificationStatus === "disqualified"
+                                ? "bg-rose-500/5 text-rose-400 border-rose-500/10"
+                                : "bg-zinc-800 text-zinc-400 border-zinc-800"
+                          }`}
                         >
-                          View Mandate
-                        </Link>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                          {seller.qualificationStatus === "qualified" 
+                            ? "Qualified" 
+                            : seller.qualificationStatus === "disqualified" 
+                              ? "Disqualified" 
+                              : "Pending"}
+                        </span>
+                      </td>
+                      <td className="py-4.5 px-6 text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          {seller.qualificationStatus === "qualified" && (
+                            <Link 
+                              href="/matches"
+                              className="p-1.5 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/20 hover:border-amber-500/30 text-amber-400 rounded-lg transition-all duration-300" 
+                              title="View AI Matches"
+                            >
+                              <Sparkles className="h-3.5 w-3.5 stroke-[2.2]" />
+                            </Link>
+                          )}
+                          <Link
+                            href={`/sellers/${seller._id}`}
+                            className="inline-flex items-center gap-1 px-3 py-1.5 bg-zinc-900 border border-zinc-800 hover:border-zinc-700 hover:bg-zinc-800/80 rounded-lg text-[10px] font-bold text-zinc-300 transition-colors"
+                          >
+                            View Mandate
+                          </Link>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
