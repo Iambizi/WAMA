@@ -7,7 +7,6 @@ import {
   Sparkles, 
   ShieldAlert, 
   Plus, 
-  ArrowUpRight, 
   Activity 
 } from "lucide-react";
 import { COPY } from "@/lib/copy";

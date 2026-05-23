@@ -28,6 +28,33 @@
 
 ---
 
+## Session 3 — 2026-05-23
+**Agent:** Antigravity
+**Step:** Step 2 — Buyer CRUD & Type Declarations
+**Status:** ✅ Complete
+
+### What Was Done
+- Implemented fully database-bound frontend routing and detail views for **Step 2 — Buyer CRUD**:
+  - Implemented live Convex lists, status badge reviews, client-side queries, creation screens, and detailed split-pane profiles with side-over drawers.
+  - Linked database actions using automatic `activityLogs` logging (e.g. `buyer_created`, `buyer_status_changed`, `buyer_updated`).
+- Resolved all strict TypeScript compilation and Next.js static asset bundling issues:
+  - Eliminated linter warnings (e.g. unused `router` and `ArrowUpRight` imports, unescaped JSX quotes).
+  - Explicitly typed parameters in Convex function handlers (`ctx: QueryCtx`, `ctx: MutationCtx`, and `args` schemas) in `convex/activityLogs.ts` to break TypeScript circular-type-checking loops.
+  - Resolved LSP relative generated module-lookup issues by isolating database compilation. Created a local `convex/tsconfig.json` enabling `"skipLibCheck": true` and excluded the `convex/` directory from root client-side `tsconfig.json` validations.
+- Verified workspace builds and linter passes with zero warnings or compilation errors.
+
+### Decisions Made
+- **Multi-Project TypeScript Isolation:** Excluded the database `convex/` directory from the root configuration and provisioned a local `convex/tsconfig.json` with `skipLibCheck: true`. This isolates frontend and serverless compilation environments and prevents LSP relative lookup errors.
+- **Strict Parameter Typing:** Explicitly typed query/mutation handler parameters in `activityLogs.ts` to break compiler loops over the generated data schemas.
+
+### Open Questions / Blockers
+- None.
+
+### Next Steps
+- Begin Step 3 — Seller CRUD & Match Matching Engine foundation.
+
+---
+
 ## Session 2 — 2026-05-21
 **Agent:** Antigravity
 **Step:** Step 1 — Project scaffold
