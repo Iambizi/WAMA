@@ -28,6 +28,33 @@
 
 ---
 
+## Session 5 — 2026-05-24
+**Agent:** Antigravity
+**Step:** Step 4 — Live Dashboard & Audit Feed
+**Status:** ✅ Complete
+
+### What Was Done
+- Reviewed the **AI Agents Implementation Blueprint** and feedback adjustments inside `docs/internal/architecture-product-alignment-review.md` to align all future match scoring and allowlist prompting schemas.
+- Implemented the full backend and frontend lifecycle for **Step 4 — Live Dashboard**:
+  - Created live Convex dashboard stats query `getStats` inside `convex/dashboard.ts` that safely counts live active buyers, mandates, unified pending reviews queue, and staged match deal counts.
+  - Linked the live activities timeline feed to the append-only `activityLogs` database collection.
+  - Converted the Advisor Dashboard [`app/dashboard/page.tsx`](file:///Users/amir/Desktop/me_repo/WAMA/app/dashboard/page.tsx) to reactive-bind live Convex stats and activities with skeleton spinners during load states.
+  - Developed a custom-designed **Time Ago Formatter** helper to render natural time labels (`Just now`, `5m ago`, `Yesterday`, `2d ago`) dynamically on William's audit logs.
+  - Registered the new `dashboard` module under `convex/_generated/api.d.ts` mock lists.
+- Verified that all compilation and linter suites pass with 100% success and zero warnings.
+
+### Decisions Made
+- **Unified Review Queue:** Grouping both pending qualified buyers and pending qualified sellers under a single, unified "Pending Qualification" stats count creates a clear and central action item count for William's daily workflow.
+- **Append-Only Logging Feed:** Hooking the recent activities grid to the append-only `activityLogs` table ensures the dashboard displays real, unalterable human and AI operational decision logs.
+
+### Open Questions / Blockers
+- None.
+
+### Next Steps
+- Begin Step 5 — AI Matching (Convex matches handlers,Claude API, allowed prompt builders, de-identification sanitizers).
+
+---
+
 ## Session 4 — 2026-05-23
 **Agent:** Antigravity
 **Step:** Step 3 — Seller CRUD

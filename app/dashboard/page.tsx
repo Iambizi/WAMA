@@ -1,77 +1,81 @@
 "use client";
 
 import Link from "next/link";
+import { useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
 import { 
   Users, 
   Landmark, 
   Sparkles, 
   ShieldAlert, 
   Plus, 
-  Activity 
+  Activity,
+  Loader2 
 } from "lucide-react";
 import { COPY } from "@/lib/copy";
 
+// Helper to format timestamps dynamically for William's activity feed
+function formatTimeAgo(timestamp: number): string {
+  const diffMs = Date.now() - timestamp;
+  if (diffMs < 0) return "Just now";
+  
+  const diffMins = Math.floor(diffMs / 60000);
+  if (diffMins < 1) return "Just now";
+  if (diffMins < 60) return `${diffMins}m ago`;
+  
+  const diffHours = Math.floor(diffMins / 60);
+  if (diffHours < 24) return `${diffHours}h ago`;
+  
+  const diffDays = Math.floor(diffHours / 24);
+  if (diffDays === 1) return "Yesterday";
+  return `${diffDays}d ago`;
+}
+
 export default function Dashboard() {
-  // Mock data for initial scaffold visual presentation
+  // Query live backend stats and activities from Convex
+  const statsData = useQuery(api.dashboard.getStats);
+  const activitiesData = useQuery(api.activityLogs.list);
+
+  const isLoading = statsData === undefined || activitiesData === undefined;
+
+  if (isLoading) {
+    return (
+      <div className="flex h-[60vh] w-full flex-col items-center justify-center space-y-4">
+        <Loader2 className="h-8 w-8 animate-spin text-amber-500" />
+        <p className="text-xs text-zinc-500">{COPY.common.loading}</p>
+      </div>
+    );
+  }
+
+  // Construct active stats using live counts
   const stats = [
     {
       title: COPY.dashboard.stats.totalBuyers,
-      value: "14",
-      change: "+2 this week",
+      value: String(statsData.totalBuyersCount),
+      change: "Active acquirers",
       icon: Users,
       color: "from-blue-500/10 to-indigo-500/10 text-blue-400 border-blue-500/10",
     },
     {
       title: COPY.dashboard.stats.totalSellers,
-      value: "8",
+      value: String(statsData.totalSellersCount),
       change: "Active mandates",
       icon: Landmark,
       color: "from-emerald-500/10 to-teal-500/10 text-emerald-400 border-emerald-500/10",
     },
     {
       title: COPY.dashboard.stats.pendingReviews,
-      value: "3",
+      value: String(statsData.pendingReviewsCount),
       change: "Action required",
       icon: ShieldAlert,
       color: "from-rose-500/10 to-orange-500/10 text-rose-400 border-rose-500/10",
     },
     {
       title: COPY.dashboard.stats.activeMatches,
-      value: "22",
-      change: "AI recommended",
+      value: String(statsData.activeMatchesCount),
+      change: "Staged deals",
       icon: Sparkles,
       color: "from-amber-500/10 to-yellow-500/10 text-amber-400 border-amber-500/20",
-    },
-  ];
-
-  const activities = [
-    {
-      id: "1",
-      action: "buyer_created",
-      label: "Acquisitions Group Inc.",
-      details: "Budget: $3.0M - $5.0M CAD",
-      time: "10 minutes ago",
-    },
-    {
-      id: "2",
-      action: "match_stage_advanced",
-      label: "TechCorp Quebec / Serial Buyer #4",
-      details: "Stage advanced: suggested → reviewed",
-      time: "2 hours ago",
-    },
-    {
-      id: "3",
-      action: "seller_created",
-      label: "Boulangerie Artisanale Montreal",
-      details: "Readiness checklist: 80% complete",
-      time: "Yesterday",
-    },
-    {
-      id: "4",
-      action: "match_approved",
-      label: "Mandate #08 / Buyer #11",
-      details: "Introduction approved by advisor",
-      time: "Yesterday",
     },
   ];
 
@@ -114,13 +118,13 @@ export default function Dashboard() {
           return (
             <div
               key={i}
-              className={`bg-zinc-900/40 border border-zinc-900 rounded-2xl p-6 relative overflow-hidden group hover:border-zinc-800 transition-all duration-300`}
+              className="bg-zinc-900/40 border border-zinc-900 rounded-2xl p-6 relative overflow-hidden group hover:border-zinc-800 transition-all duration-300"
             >
               {/* Subtle visual gradient glow behind stats */}
               <div className={`absolute -right-4 -bottom-4 w-24 h-24 rounded-full bg-gradient-to-br ${stat.color.split(" ")[0]} opacity-20 blur-xl group-hover:scale-125 transition-transform duration-500`} />
               
               <div className="flex items-center justify-between">
-                <span className="text-xs font-medium text-zinc-400 uppercase tracking-wider">
+                <span className="text-xs font-medium text-zinc-400 uppercase tracking-wider font-semibold">
                   {stat.title}
                 </span>
                 <div className={`p-2 bg-gradient-to-br ${stat.color.split(" ")[0]} ${stat.color.split(" ")[1]} border ${stat.color.split(" ")[3]} rounded-xl`}>
@@ -128,10 +132,10 @@ export default function Dashboard() {
                 </div>
               </div>
               <div className="mt-4 flex items-baseline gap-2">
-                <span className="text-3xl font-bold tracking-tight text-white">
+                <span className="text-3xl font-bold tracking-tight text-white font-mono">
                   {stat.value}
                 </span>
-                <span className="text-[11px] text-zinc-500 font-medium">
+                <span className="text-[11px] text-zinc-500 font-semibold uppercase tracking-wider">
                   {stat.change}
                 </span>
               </div>
@@ -142,33 +146,38 @@ export default function Dashboard() {
 
       {/* Dashboard Sub-content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
         {/* Recent Activities Section */}
         <div className="lg:col-span-2 bg-zinc-900/30 border border-zinc-900 rounded-2xl p-6 space-y-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2.5">
-              <Activity className="h-4.5 w-4.5 text-amber-500" />
-              <h2 className="text-base font-bold text-white">
-                {COPY.dashboard.activityFeedTitle}
-              </h2>
-            </div>
+          <div className="flex items-center space-x-2.5">
+            <Activity className="h-4.5 w-4.5 text-amber-500" />
+            <h2 className="text-base font-bold text-white">
+              {COPY.dashboard.activityFeedTitle}
+            </h2>
           </div>
 
-          <div className="divide-y divide-zinc-900/60">
-            {activities.map((activity) => (
-              <div key={activity.id} className="py-4 first:pt-0 last:pb-0 flex items-start justify-between gap-4 group">
-                <div className="space-y-1">
-                  <p className="text-sm font-semibold text-zinc-200 group-hover:text-amber-400 transition-colors duration-300">
-                    {activity.label}
-                  </p>
-                  <p className="text-xs text-zinc-500">
-                    {activity.details}
-                  </p>
+          <div className="divide-y divide-zinc-900/40">
+            {activitiesData && activitiesData.length > 0 ? (
+              activitiesData.map((activity) => (
+                <div key={activity._id} className="py-4.5 first:pt-0 last:pb-0 flex items-start justify-between gap-4 group">
+                  <div className="space-y-1">
+                    <p className="text-sm font-semibold text-zinc-200 group-hover:text-amber-400 transition-colors duration-300 capitalize">
+                      {activity.entityLabel} – <span className="text-xs text-zinc-400 font-normal uppercase tracking-wider">{activity.action.replace("_", " ")}</span>
+                    </p>
+                    <p className="text-xs text-zinc-500">
+                      {activity.details}
+                    </p>
+                  </div>
+                  <span className="text-[10px] text-zinc-500 shrink-0 mt-0.5 font-semibold">
+                    {formatTimeAgo(activity.createdAt)}
+                  </span>
                 </div>
-                <span className="text-[10px] text-zinc-500 shrink-0 mt-0.5">
-                  {activity.time}
-                </span>
+              ))
+            ) : (
+              <div className="py-12 text-center text-zinc-500 text-xs font-medium">
+                {COPY.dashboard.noActivity}
               </div>
-            ))}
+            )}
           </div>
         </div>
 
@@ -184,7 +193,7 @@ export default function Dashboard() {
             </p>
           </div>
           <div className="p-4 bg-amber-500/5 border border-amber-500/10 rounded-xl space-y-2">
-            <span className="text-[10px] font-bold text-amber-400 uppercase tracking-wider">
+            <span className="text-[10px] font-bold text-amber-400 uppercase tracking-wider block">
               Advisor Notice
             </span>
             <p className="text-[11px] leading-relaxed text-zinc-400">
