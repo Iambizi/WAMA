@@ -28,6 +28,30 @@
 
 ---
 
+## Session 6 — 2026-05-27
+**Agent:** Antigravity
+**Step:** Step 5 — AI Matching Engine
+**Status:** ✅ Complete
+
+### What Was Done
+- Registered the new `matches` module under `convex/_generated/api.d.ts` and set up exports.
+- Fixed `app/api/match/route.ts` linter warnings by properly importing `Id` from `@/convex/_generated/dataModel` and replacing the `as any` type assertion.
+- Bound live database collection joins to the Match dashboard at `app/matches/page.tsx` and interactive matching triggers at `app/sellers/[id]/page.tsx`.
+- Resolved TypeScript compiler warnings in `app/matches/page.tsx` by explicitly typing array callback parameters (`c: string`, `idx: number`) inside criteria search maps.
+- Verified workspace builds and linter passes with zero warnings or compilation errors.
+
+### Decisions Made
+- **Client type resolution:** Explicitly casting `realBuyerId` as `Id<"buyers">` inside the API route provides full TypeScript compile-time safety and complies with high-quality backend constraints.
+- **Criteria search typing:** Explicitly mapping custom arrays inside filter scopes avoids implicit compiler inferences and keeps builds clean.
+
+### Open Questions / Blockers
+- None.
+
+### Next Steps
+- Begin Step 6 — Match Pipeline (review view, details panel, stage transitions, advisor note updates, audit integrations).
+
+---
+
 ## Session 5 — 2026-05-24
 **Agent:** Antigravity
 **Step:** Step 4 — Live Dashboard & Audit Feed

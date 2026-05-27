@@ -41,8 +41,8 @@ There are no buyer or seller logins in V0. William is the only user.
 > **Update this section at the start of each session.**
 
 ```
-Last completed step: [ Step 4 — Dashboard ]
-Next step to build: [ Step 5 — AI Matching ]
+Last completed step: [ Step 5 — AI Matching ]
+Next step to build: [ Step 6 — Match Pipeline ]
 Blockers: none
 ```
 

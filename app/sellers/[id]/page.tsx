@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
@@ -36,9 +36,11 @@ import { SellerForm, SellerFormValues } from "@/components/sellers/seller-form";
 
 export default function SellerProfile() {
   const params = useParams();
+  const router = useRouter();
   const id = params.id as string;
   const [isEditing, setIsEditing] = useState(false);
   const [updatingStatus, setUpdatingStatus] = useState(false);
+  const [generatingMatches, setGeneratingMatches] = useState(false);
 
   // Fetch seller by id from Convex
   const seller = useQuery(api.sellers.get, { id: id as Id<"sellers"> });
@@ -85,6 +87,30 @@ export default function SellerProfile() {
   const handleEditSubmit = async (values: SellerFormValues) => {
     await updateSeller({ id: seller._id, ...values });
     setIsEditing(false);
+  };
+
+  const handleGenerateMatches = async () => {
+    setGeneratingMatches(true);
+    try {
+      const response = await fetch("/api/match", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ sellerId: seller._id }),
+      });
+      if (response.ok) {
+        router.push("/matches");
+      } else {
+        const errorData = await response.json();
+        alert(errorData.details || "Failed to generate matches.");
+      }
+    } catch (err) {
+      console.error("Match generation triggered error:", err);
+      alert("An unexpected error occurred during match generation.");
+    } finally {
+      setGeneratingMatches(false);
+    }
   };
 
   // Maps values to human-readable labels
@@ -156,15 +182,25 @@ export default function SellerProfile() {
           </div>
 
           <div className="flex flex-wrap items-center gap-3 shrink-0">
-            {/* AI Matches Shortcut */}
+            {/* AI Matches Generator Button */}
             {seller.qualificationStatus === "qualified" && (
-              <Link
-                href="/matches"
-                className="flex items-center gap-2 px-4 py-2 bg-amber-500 hover:bg-amber-600 text-zinc-950 rounded-xl text-xs font-bold transition-all duration-300 shadow-md shadow-amber-500/10"
+              <button
+                onClick={handleGenerateMatches}
+                disabled={generatingMatches}
+                className="flex items-center gap-2 px-4 py-2 bg-amber-500 hover:bg-amber-600 disabled:bg-zinc-800 disabled:text-zinc-500 text-zinc-950 rounded-xl text-xs font-bold transition-all duration-300 shadow-md shadow-amber-500/10 cursor-pointer disabled:cursor-not-allowed"
               >
-                <Sparkles className="h-4 w-4 text-zinc-950 stroke-[2.5]" />
-                <span>{COPY.matches.generateButton}</span>
-              </Link>
+                {generatingMatches ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin text-zinc-950" />
+                    <span>{COPY.matches.generating}</span>
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="h-4 w-4 text-zinc-950 stroke-[2.5]" />
+                    <span>{COPY.matches.generateButton}</span>
+                  </>
+                )}
+              </button>
             )}
 
             {/* Status Mutation Select */}
