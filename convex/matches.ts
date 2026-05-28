@@ -144,3 +144,121 @@ export const logMatchGeneration = mutation({
     });
   },
 });
+
+// Get a single match by ID, fully populated with buyer and seller details
+export const getPopulated = query({
+  args: { id: v.id("matches") },
+  handler: async (ctx: QueryCtx, args) => {
+    await requireAdvisor(ctx);
+    const match = await ctx.db.get(args.id);
+    if (!match) return null;
+
+    const buyer = await ctx.db.get(match.buyerId);
+    const seller = await ctx.db.get(match.sellerId);
+
+    return {
+      ...match,
+      buyerName: buyer?.name || "Unknown Buyer",
+      buyerEmail: buyer?.email || "",
+      buyerPhone: buyer?.phone || "",
+      buyerSectorInterest: buyer?.sectorInterest || [],
+      buyerBudgetMin: buyer?.budgetMin ?? 0,
+      buyerBudgetMax: buyer?.budgetMax ?? 0,
+      buyerGeography: buyer?.geography || [],
+      buyerFinancingType: buyer?.financingType || "unknown",
+      buyerAcquisitionExperience: buyer?.acquisitionExperience || "first_time",
+      buyerAcquisitionTimeline: buyer?.acquisitionTimeline || "24mo_plus",
+      buyerNdaSigned: buyer?.ndaSigned ?? false,
+      buyerProofOfFundsReviewed: buyer?.proofOfFundsReviewed ?? false,
+      buyerBackgroundCheckComplete: buyer?.backgroundCheckComplete ?? false,
+      buyerNotes: buyer?.notes || "",
+      
+      sellerBusinessName: seller?.businessName || "Unknown Seller",
+      sellerName: seller?.name || "",
+      sellerEmail: seller?.email || "",
+      sellerPhone: seller?.phone || "",
+      sellerSector: seller?.sector || "",
+      sellerGeography: seller?.geography || "",
+      sellerRevenueRange: seller?.revenueRange || "under_500k",
+      sellerEbitdaRange: seller?.ebitdaRange || "under_100k",
+      sellerEmployeeCount: seller?.employeeCount || "1_5",
+      sellerYearsInOperation: seller?.yearsInOperation ?? 0,
+      sellerTransactionType: seller?.transactionType || "full_sale",
+      sellerReasonForSale: seller?.reasonForSale || "",
+      sellerReadinessScore: seller?.readinessScore ?? 0,
+      sellerNotes: seller?.notes || "",
+    };
+  },
+});
+
+// Update match pipeline status and/or advisor notes
+export const updateStatus = mutation({
+  args: {
+    id: v.id("matches"),
+    status: v.union(
+      v.literal("suggested"),
+      v.literal("reviewed"),
+      v.literal("approved"),
+      v.literal("introduced"),
+      v.literal("nda_signed"),
+      v.literal("in_discussions"),
+      v.literal("closed_won"),
+      v.literal("closed_lost"),
+      v.literal("rejected")
+    ),
+    advisorNotes: v.optional(v.string()),
+  },
+  handler: async (
+    ctx: MutationCtx,
+    args: {
+      id: Id<"matches">;
+      status:
+        | "suggested"
+        | "reviewed"
+        | "approved"
+        | "introduced"
+        | "nda_signed"
+        | "in_discussions"
+        | "closed_won"
+        | "closed_lost"
+        | "rejected";
+      advisorNotes?: string;
+    }
+  ) => {
+    await requireAdvisor(ctx);
+    const existing = await ctx.db.get(args.id);
+    if (!existing) throw new Error("Match recommendation not found");
+
+    const oldStatus = existing.status;
+    const now = Date.now();
+
+    await ctx.db.patch(args.id, {
+      status: args.status,
+      advisorNotes: args.advisorNotes !== undefined ? args.advisorNotes : existing.advisorNotes,
+      updatedAt: now,
+    });
+
+    const buyer = await ctx.db.get(existing.buyerId);
+    const seller = await ctx.db.get(existing.sellerId);
+    const label = `${seller?.businessName || "Seller"} ↔ ${buyer?.name || "Buyer"}`;
+
+    // Log the event based on transition
+    let action = "match_stage_advanced";
+    if (args.status === "approved") {
+      action = "match_approved";
+    } else if (args.status === "rejected") {
+      action = "match_rejected";
+    }
+
+    await ctx.db.insert("activityLogs", {
+      action,
+      entityType: "match",
+      entityId: args.id,
+      entityLabel: label,
+      details: `${oldStatus} → ${args.status}`,
+      createdAt: now,
+    });
+
+    return args.id;
+  },
+});
