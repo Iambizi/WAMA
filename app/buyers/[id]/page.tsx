@@ -34,6 +34,7 @@ import {
 } from "@/lib/constants";
 import { BuyerStatusBadge } from "@/components/buyers/buyer-status-badge";
 import { BuyerForm, BuyerFormValues } from "@/components/buyers/buyer-form";
+import { ConfirmModal } from "@/components/ui/confirm-modal";
 
 function formatCAD(amount: number) {
   if (amount >= 1_000_000) {
@@ -48,6 +49,8 @@ export default function BuyerProfile() {
   const id = params.id as string;
   const [isEditing, setIsEditing] = useState(false);
   const [updatingStatus, setUpdatingStatus] = useState(false);
+  const [pendingStatus, setPendingStatus] = useState<"pending" | "qualified" | "disqualified" | null>(null);
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
 
   // Fetch buyer by id from Convex
   const buyer = useQuery(api.buyers.get, { id: id as Id<"buyers"> });
@@ -81,13 +84,24 @@ export default function BuyerProfile() {
 
   const handleStatusChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newStatus = e.target.value as "pending" | "qualified" | "disqualified";
+    if (newStatus === "disqualified") {
+      setPendingStatus(newStatus);
+      setIsConfirmOpen(true);
+    } else {
+      await performStatusChange(newStatus);
+    }
+  };
+
+  const performStatusChange = async (status: "pending" | "qualified" | "disqualified") => {
     setUpdatingStatus(true);
     try {
-      await updateStatus({ id: buyer._id, status: newStatus });
+      await updateStatus({ id: buyer._id, status });
     } catch (err) {
       console.error("Failed to update status:", err);
     } finally {
       setUpdatingStatus(false);
+      setIsConfirmOpen(false);
+      setPendingStatus(null);
     }
   };
 
@@ -435,6 +449,20 @@ export default function BuyerProfile() {
           </div>
         </>
       )}
+
+      <ConfirmModal
+        isOpen={isConfirmOpen}
+        title="Confirm Disqualification"
+        description={`Are you sure you want to disqualify the buyer mandate for ${buyer.name}? This will archive their matching readiness.`}
+        confirmLabel="Disqualify Client"
+        cancelLabel="Keep Active"
+        onConfirm={() => pendingStatus && performStatusChange(pendingStatus)}
+        onCancel={() => {
+          setIsConfirmOpen(false);
+          setPendingStatus(null);
+        }}
+        variant="destructive"
+      />
     </div>
   );
 }

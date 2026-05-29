@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
-import { Sparkles, Search, ArrowUpDown, Loader2 } from "lucide-react";
+import { Sparkles, Search, ArrowUpDown } from "lucide-react";
 import { COPY } from "@/lib/copy";
 
 export default function Matches() {
@@ -105,26 +105,54 @@ export default function Matches() {
 
       {/* Matches Data Grid */}
       <div className="bg-zinc-900/30 border border-zinc-900 rounded-2xl overflow-hidden">
-        {isLoading ? (
-          <div className="py-24 text-center space-y-4">
-            <Loader2 className="mx-auto h-8 w-8 animate-spin text-zinc-500" />
-            <p className="text-xs text-zinc-500">{COPY.common.loading}</p>
-          </div>
-        ) : sortedMatches.length > 0 ? (
-          <div className="overflow-x-auto">
-            <table className="w-full border-collapse text-left">
-              <thead>
-                <tr className="border-b border-zinc-900 text-[10px] font-bold uppercase tracking-wider text-zinc-400 bg-zinc-950/20">
-                  <th className="py-4.5 px-6">Match Fit (Score)</th>
-                  <th className="py-4.5 px-6">Seller Mandate</th>
-                  <th className="py-4.5 px-6">Qualified Buyer</th>
-                  <th className="py-4.5 px-6">Matched Criteria</th>
-                  <th className="py-4.5 px-6">Pipeline Stage</th>
-                  <th className="py-4.5 px-6 text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-zinc-900/40 text-xs">
-                {sortedMatches.map((match) => (
+        <div className="overflow-x-auto">
+          <table className="w-full border-collapse text-left">
+            <thead>
+              <tr className="border-b border-zinc-900 text-[10px] font-bold uppercase tracking-wider text-zinc-400 bg-zinc-950/20">
+                <th className="py-4.5 px-6">Match Fit (Score)</th>
+                <th className="py-4.5 px-6">Seller Mandate</th>
+                <th className="py-4.5 px-6">Qualified Buyer</th>
+                <th className="py-4.5 px-6">Matched Criteria</th>
+                <th className="py-4.5 px-6">Pipeline Stage</th>
+                <th className="py-4.5 px-6 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-zinc-900/40 text-xs">
+              {isLoading ? (
+                // Pulse rows
+                Array.from({ length: 5 }).map((_, idx) => (
+                  <tr key={idx} className="animate-pulse">
+                    <td className="py-4.5 px-6">
+                      <div className="h-10 w-10 bg-zinc-900 rounded-xl" />
+                    </td>
+                    <td className="py-4.5 px-6">
+                      <div className="flex flex-col gap-2">
+                        <div className="h-3.5 bg-zinc-800/80 rounded w-32" />
+                        <div className="h-2.5 bg-zinc-900/80 rounded w-20" />
+                      </div>
+                    </td>
+                    <td className="py-4.5 px-6">
+                      <div className="flex flex-col gap-2">
+                        <div className="h-3.5 bg-zinc-800/80 rounded w-28" />
+                        <div className="h-2.5 bg-zinc-900/80 rounded w-36" />
+                      </div>
+                    </td>
+                    <td className="py-4.5 px-6">
+                      <div className="flex gap-1">
+                        <div className="h-4 bg-zinc-900 rounded w-12" />
+                        <div className="h-4 bg-zinc-900 rounded w-16" />
+                      </div>
+                    </td>
+                    <td className="py-4.5 px-6">
+                      <div className="h-5 bg-zinc-900 rounded w-16" />
+                    </td>
+                    <td className="py-4.5 px-6 text-right">
+                      <div className="h-7 bg-zinc-900 rounded-lg w-24 ml-auto" />
+                    </td>
+                  </tr>
+                ))
+              ) : sortedMatches.length > 0 ? (
+                sortedMatches.map((match) => (
                   <tr key={match._id} className="hover:bg-zinc-900/10 transition-colors group">
                     <td className="py-4.5 px-6">
                       <div className="flex items-center gap-3">
@@ -187,17 +215,19 @@ export default function Matches() {
                       </Link>
                     </td>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        ) : (
-          <div className="py-16 text-center space-y-3">
-            <Sparkles className="mx-auto h-10 w-10 text-zinc-600" />
-            <p className="text-sm font-semibold text-zinc-300">{COPY.common.noResults}</p>
-            <p className="text-xs text-zinc-500">There are no match recommendations under this status filter yet.</p>
-          </div>
-        )}
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={6} className="py-16 text-center space-y-3">
+                    <Sparkles className="mx-auto h-10 w-10 text-zinc-600" />
+                    <p className="text-sm font-semibold text-zinc-300">{COPY.common.noResults}</p>
+                    <p className="text-xs text-zinc-500">There are no match recommendations under this status filter yet.</p>
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

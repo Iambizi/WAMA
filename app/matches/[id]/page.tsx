@@ -25,6 +25,7 @@ import {
   HelpCircle
 } from "lucide-react";
 import { COPY } from "@/lib/copy";
+import { ConfirmModal } from "@/components/ui/confirm-modal";
 import {
   SECTORS,
   GEOGRAPHIES,
@@ -57,6 +58,8 @@ export default function MatchDetail() {
   const [savingNotes, setSavingNotes] = useState(false);
   const [updatingStatus, setUpdatingStatus] = useState(false);
   const [statusMessage, setStatusMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [pendingStatus, setPendingStatus] = useState<typeof PIPELINE_STAGES[number]["value"] | "rejected" | "closed_lost" | null>(null);
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
 
   // Fetch populated match recommendation from Convex
   const match = useQuery(api.matches.getPopulated, { id: id as Id<"matches"> });
@@ -93,6 +96,15 @@ export default function MatchDetail() {
   }
 
   const handleStageTransition = async (newStatus: typeof PIPELINE_STAGES[number]["value"] | "rejected" | "closed_lost") => {
+    if (newStatus === "rejected") {
+      setPendingStatus(newStatus);
+      setIsConfirmOpen(true);
+    } else {
+      await performStageTransition(newStatus);
+    }
+  };
+
+  const performStageTransition = async (newStatus: typeof PIPELINE_STAGES[number]["value"] | "rejected" | "closed_lost") => {
     setUpdatingStatus(true);
     setStatusMessage(null);
     try {
@@ -107,6 +119,8 @@ export default function MatchDetail() {
       setStatusMessage({ type: "error", text: "An error occurred while attempting to advance pipeline stage." });
     } finally {
       setUpdatingStatus(false);
+      setIsConfirmOpen(false);
+      setPendingStatus(null);
     }
   };
 
@@ -653,6 +667,19 @@ export default function MatchDetail() {
         </div>
       </div>
 
+      <ConfirmModal
+        isOpen={isConfirmOpen}
+        title="Confirm Match Rejection"
+        description="Are you sure you want to reject and archive this recommendation? It will be moved to rejected status and marked as inactive."
+        confirmLabel="Reject Match"
+        cancelLabel="Keep Reviewing"
+        onConfirm={() => pendingStatus && performStageTransition(pendingStatus)}
+        onCancel={() => {
+          setIsConfirmOpen(false);
+          setPendingStatus(null);
+        }}
+        variant="destructive"
+      />
     </div>
   );
 }

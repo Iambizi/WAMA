@@ -41,8 +41,8 @@ There are no buyer or seller logins in V0. William is the only user.
 > **Update this section at the start of each session.**
 
 ```
-Last completed step: [ Step 6 — Match Pipeline ]
-Next step to build: [ Step 7 — Polish ]
+Last completed step: [ Step 7 — Polish ]
+Next step to build: [ All steps completed successfully! ]
 Blockers: none
 ```
 

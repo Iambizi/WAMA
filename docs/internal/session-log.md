@@ -28,6 +28,37 @@
 
 ---
 
+## Session 8 — 2026-05-29
+**Agent:** Antigravity
+**Step:** Step 7 — Polish
+**Status:** ✅ Complete
+
+### What Was Done
+- Created reusable, glassmorphic `<ConfirmModal>` component in `components/ui/confirm-modal.tsx` to handle critical advisor actions with animated backdrops, exit states, and destructive HSL variants.
+- Polished the **Buyers module**:
+  - Replaced full-page loader spinner in `app/buyers/page.tsx` with elegant pulsing animated table row placeholder skeletons.
+  - Linked status transitions to `<ConfirmModal>` in `app/buyers/[id]/page.tsx` to confirm disqualification of a buyer mandate.
+- Polished the **Sellers module**:
+  - Built matching table row placeholder skeletons in `app/sellers/page.tsx` that load list frames instantly.
+  - Integrated `<ConfirmModal>` in `app/sellers/[id]/page.tsx` to protect Sell-side mandates from accidental disqualification status changes.
+- Polished the **Matches module**:
+  - Implemented identical table skeletons inside matches board `app/matches/page.tsx` mimicking radial scores and criteria tags.
+  - Linked the **"Reject Match"** action in `app/matches/[id]/page.tsx` to `<ConfirmModal>` to shield deal matchups.
+- Cleared unused imports (e.g. `Loader2`) and resolved ESLint warnings across lists.
+- Verified workspace builds and linter passes with zero warnings or compilation errors.
+
+### Decisions Made
+- **Responsive Table Skeletons:** Loading layout structures instantly and replacing database loading frames with pulsing animated row blocks provides a highly premium and instant perceived page load speed.
+- **Glassmorphic confirmation overlay:** Using high-contrast HSL red dialog overlays shields active transaction lists from unintended or irreversible deal archive operations.
+
+### Open Questions / Blockers
+- None. All 7 steps are fully completed and verified!
+
+### Next Steps
+- Deliver final orientational walkthrough of the completed boutique M&A advisor tool.
+
+---
+
 ## Session 7 — 2026-05-28
 **Agent:** Antigravity
 **Step:** Step 6 — Match Pipeline
