@@ -13,6 +13,7 @@ import {
   Loader2 
 } from "lucide-react";
 import { COPY } from "@/lib/copy";
+import { useUser } from "@clerk/nextjs";
 
 // Helper to format timestamps dynamically for William's activity feed
 function formatTimeAgo(timestamp: number): string {
@@ -32,6 +33,7 @@ function formatTimeAgo(timestamp: number): string {
 }
 
 export default function Dashboard() {
+  const { user } = useUser();
   // Query live backend stats and activities from Convex
   const statsData = useQuery(api.dashboard.getStats);
   const activitiesData = useQuery(api.activityLogs.list);
@@ -84,10 +86,10 @@ export default function Dashboard() {
       {/* Header section */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
         <div className="space-y-1.5">
-          <h1 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
-            {COPY.dashboard.welcome}
+          <h1 className="text-3xl font-extrabold tracking-tight text-foreground sm:text-4xl">
+            Welcome back, {user?.firstName || user?.username || user?.fullName?.split(" ")[0] || "William"}
           </h1>
-          <p className="text-sm text-zinc-400 max-w-2xl">
+          <p className="text-sm text-muted-foreground max-w-2xl">
             {COPY.dashboard.subtitle}
           </p>
         </div>
@@ -96,9 +98,9 @@ export default function Dashboard() {
         <div className="flex items-center gap-3">
           <Link
             href="/buyers/new"
-            className="flex items-center gap-2 px-4 py-2.5 bg-zinc-900 border border-zinc-800 hover:border-zinc-700 hover:bg-zinc-800/80 rounded-xl text-xs font-semibold text-zinc-200 transition-all duration-300 shadow-sm"
+            className="flex items-center gap-2 px-4 py-2.5 bg-card border border-border hover:bg-muted rounded-xl text-xs font-semibold text-muted-foreground hover:text-foreground transition-all duration-300 shadow-sm"
           >
-            <Plus className="h-4 w-4 text-zinc-400" />
+            <Plus className="h-4 w-4 text-muted-foreground" />
             <span>Add Buyer</span>
           </Link>
           <Link
@@ -118,13 +120,13 @@ export default function Dashboard() {
           return (
             <div
               key={i}
-              className="bg-zinc-900/40 border border-zinc-900 rounded-2xl p-6 relative overflow-hidden group hover:border-zinc-800 transition-all duration-300"
+              className="bg-card/60 border border-border rounded-2xl p-6 relative overflow-hidden group hover:border-muted-foreground/30 transition-all duration-300 dark:bg-zinc-900/40 dark:border-zinc-900"
             >
               {/* Subtle visual gradient glow behind stats */}
               <div className={`absolute -right-4 -bottom-4 w-24 h-24 rounded-full bg-gradient-to-br ${stat.color.split(" ")[0]} opacity-20 blur-xl group-hover:scale-125 transition-transform duration-500`} />
               
               <div className="flex items-center justify-between">
-                <span className="text-xs font-medium text-zinc-400 uppercase tracking-wider font-semibold">
+                <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider font-semibold">
                   {stat.title}
                 </span>
                 <div className={`p-2 bg-gradient-to-br ${stat.color.split(" ")[0]} ${stat.color.split(" ")[1]} border ${stat.color.split(" ")[3]} rounded-xl`}>
@@ -132,10 +134,10 @@ export default function Dashboard() {
                 </div>
               </div>
               <div className="mt-4 flex items-baseline gap-2">
-                <span className="text-3xl font-bold tracking-tight text-white font-mono">
+                <span className="text-3xl font-bold tracking-tight text-foreground font-mono">
                   {stat.value}
                 </span>
-                <span className="text-[11px] text-zinc-500 font-semibold uppercase tracking-wider">
+                <span className="text-[11px] text-muted-foreground font-semibold uppercase tracking-wider">
                   {stat.change}
                 </span>
               </div>
@@ -148,33 +150,33 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
         {/* Recent Activities Section */}
-        <div className="lg:col-span-2 bg-zinc-900/30 border border-zinc-900 rounded-2xl p-6 space-y-6">
+        <div className="lg:col-span-2 bg-card/40 border border-border rounded-2xl p-6 space-y-6 dark:bg-zinc-900/30 dark:border-zinc-900">
           <div className="flex items-center space-x-2.5">
             <Activity className="h-4.5 w-4.5 text-amber-500" />
-            <h2 className="text-base font-bold text-white">
+            <h2 className="text-base font-bold text-foreground">
               {COPY.dashboard.activityFeedTitle}
             </h2>
           </div>
 
-          <div className="divide-y divide-zinc-900/40">
+          <div className="divide-y divide-border/40">
             {activitiesData && activitiesData.length > 0 ? (
               activitiesData.map((activity) => (
                 <div key={activity._id} className="py-4.5 first:pt-0 last:pb-0 flex items-start justify-between gap-4 group">
                   <div className="space-y-1">
-                    <p className="text-sm font-semibold text-zinc-200 group-hover:text-amber-400 transition-colors duration-300 capitalize">
-                      {activity.entityLabel} – <span className="text-xs text-zinc-400 font-normal uppercase tracking-wider">{activity.action.replace("_", " ")}</span>
+                    <p className="text-sm font-semibold text-foreground group-hover:text-amber-500 transition-colors duration-300 capitalize">
+                      {activity.entityLabel} – <span className="text-xs text-muted-foreground font-normal uppercase tracking-wider">{activity.action.replace("_", " ")}</span>
                     </p>
-                    <p className="text-xs text-zinc-500">
+                    <p className="text-xs text-muted-foreground">
                       {activity.details}
                     </p>
                   </div>
-                  <span className="text-[10px] text-zinc-500 shrink-0 mt-0.5 font-semibold">
+                  <span className="text-[10px] text-muted-foreground shrink-0 mt-0.5 font-semibold">
                     {formatTimeAgo(activity.createdAt)}
                   </span>
                 </div>
               ))
             ) : (
-              <div className="py-12 text-center text-zinc-500 text-xs font-medium">
+              <div className="py-12 text-center text-muted-foreground text-xs font-medium">
                 {COPY.dashboard.noActivity}
               </div>
             )}
@@ -182,21 +184,21 @@ export default function Dashboard() {
         </div>
 
         {/* Quick Help / Advisor Guide Section */}
-        <div className="bg-gradient-to-br from-zinc-900/50 to-zinc-950 border border-zinc-900 rounded-2xl p-6 flex flex-col justify-between space-y-6">
+        <div className="bg-card border border-border rounded-2xl p-6 flex flex-col justify-between space-y-6 dark:bg-gradient-to-br dark:from-zinc-900/50 dark:to-zinc-950 dark:border-zinc-900">
           <div className="space-y-3">
-            <h3 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
-              <Sparkles className="h-4 w-4 text-amber-400" />
+            <h3 className="text-sm font-bold text-foreground uppercase tracking-wider flex items-center gap-2">
+              <Sparkles className="h-4 w-4 text-amber-500" />
               <span>Matching Engine</span>
             </h3>
-            <p className="text-xs leading-relaxed text-zinc-400">
+            <p className="text-xs leading-relaxed text-muted-foreground">
               Matches are generated by sending fully de-identified business criteria to Claude Sonnet. PII (names, business titles, company references) are strictly stripped beforehand.
             </p>
           </div>
-          <div className="p-4 bg-amber-500/5 border border-amber-500/10 rounded-xl space-y-2">
-            <span className="text-[10px] font-bold text-amber-400 uppercase tracking-wider block">
+          <div className="p-4 bg-amber-500/10 dark:bg-amber-500/5 border border-amber-500/20 rounded-xl space-y-2">
+            <span className="text-[10px] font-bold text-amber-500 uppercase tracking-wider block">
               Advisor Notice
             </span>
-            <p className="text-[11px] leading-relaxed text-zinc-400">
+            <p className="text-[11px] leading-relaxed text-muted-foreground">
               Ensure document checklists are updated on seller profiles before triggering match recommendations to optimize match readiness scores.
             </p>
           </div>
