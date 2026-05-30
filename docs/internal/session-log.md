@@ -28,6 +28,25 @@
 
 ---
 
+## Session 10 — 2026-05-30
+**Agent:** Antigravity
+**Step:** Step 7 — Polish (Form Styling & Theme Integration)
+**Status:** ✅ Complete
+
+### What Was Done
+- **Fixed Tailwind CSS v4 selector strategy**: Configured `@variant dark (&:where(.dark, .dark *))` in `app/globals.css` to restrict `dark:` variants exclusively to class-based toggling (`.dark` on `document.documentElement`) rather than automatically triggering on macOS browser preferences.
+- **Polished Seller & Buyer forms**: Fully integrated semantic design tokens (`bg-card`, `border-border`, `text-foreground`, `text-muted-foreground`) inside both `components/sellers/seller-form.tsx` and `components/buyers/buyer-form.tsx` inputs, selects, dropdowns, labels, and borders.
+- **Removed hardcoded dark layout styling**: Refactored the form card containers inside `app/sellers/new/page.tsx` and `app/buyers/new/page.tsx` to leverage adaptive cards rather than locked dark-only gray classes.
+- **Verified builds & compilation**: Succeeded in production Next.js builds and ESLint suites with 100% clean reports.
+
+### Decisions Made
+- Overriding the Tailwind v4 built-in `dark` selector compiles custom components to stay pristine and consistent with the active portal layout context.
+
+### Next Steps
+- Deliver walkthrough orientation.
+
+---
+
 ## Session 9 — 2026-05-29
 **Agent:** Antigravity
 **Step:** Step 7 — Polish (Typography & Theme Switching)

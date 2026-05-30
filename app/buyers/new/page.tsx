@@ -24,25 +24,25 @@ export default function NewBuyer() {
       <div className="space-y-4">
         <Link
           href="/buyers"
-          className="inline-flex items-center gap-1.5 text-xs text-zinc-400 hover:text-zinc-200 transition-colors"
+          className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
         >
           <ArrowLeft className="h-3.5 w-3.5" />
           <span>Back to buyers list</span>
         </Link>
 
         <div className="space-y-1">
-          <h1 className="text-2xl font-bold tracking-tight text-white flex items-center gap-2.5">
-            <Users className="h-6 w-6 text-zinc-400" />
+          <h1 className="text-2xl font-bold tracking-tight text-foreground flex items-center gap-2.5">
+            <Users className="h-6 w-6 text-muted-foreground" />
             <span>{COPY.buyers.newButton}</span>
           </h1>
-          <p className="text-xs text-zinc-400">
+          <p className="text-xs text-muted-foreground">
             Define contact details, CAD budget thresholds, sector tags, and advisor checklist states.
           </p>
         </div>
       </div>
 
       {/* Form Card */}
-      <div className="bg-zinc-900/30 border border-zinc-900 rounded-2xl p-6 sm:p-8">
+      <div className="bg-card border border-border rounded-2xl p-6 sm:p-8 shadow-sm dark:bg-zinc-900/30 dark:border-zinc-900">
         <BuyerForm 
           onSubmit={handleSubmit}
           onCancel={() => router.push("/buyers")}

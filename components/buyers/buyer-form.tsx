@@ -118,7 +118,7 @@ export function BuyerForm({
   return (
     <form onSubmit={handleFormSubmit} className="space-y-10 max-w-4xl">
       {error && (
-        <div className="p-4 bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs font-semibold rounded-xl flex items-center">
+        <div className="p-4 bg-rose-500/10 border border-rose-500/20 text-rose-500 dark:text-rose-400 text-xs font-semibold rounded-xl flex items-center">
           {error}
         </div>
       )}
@@ -131,12 +131,12 @@ export function BuyerForm({
           
           {/* Section 1: Contact Identity */}
           <div className="space-y-4">
-            <h3 className="text-sm font-bold text-zinc-300 uppercase tracking-wider">
+            <h3 className="text-sm font-bold text-foreground/80 uppercase tracking-wider">
               1. Contact Profile
             </h3>
             
             <div className="space-y-2">
-              <label className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider">
+              <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">
                 {COPY.buyers.fields.name} *
               </label>
               <input
@@ -144,14 +144,14 @@ export function BuyerForm({
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="e.g. Samuel Dubé"
-                className="w-full px-4 py-2.5 bg-zinc-900 border border-zinc-800 rounded-xl text-sm text-white placeholder-zinc-500 outline-none focus:border-zinc-700 transition-colors"
+                className="w-full px-4 py-2.5 bg-card border border-border rounded-xl text-sm text-foreground placeholder-muted-foreground outline-none focus:border-muted-foreground/50 transition-colors dark:bg-zinc-900 dark:border-zinc-800 dark:text-white dark:placeholder-zinc-500 dark:focus:border-zinc-700"
                 disabled={loading}
               />
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider">
+                <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">
                   {COPY.buyers.fields.email} *
                 </label>
                 <input
@@ -159,13 +159,13 @@ export function BuyerForm({
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="name@company.com"
-                  className="w-full px-4 py-2.5 bg-zinc-900 border border-zinc-800 rounded-xl text-sm text-white placeholder-zinc-500 outline-none focus:border-zinc-700 transition-colors"
+                  className="w-full px-4 py-2.5 bg-card border border-border rounded-xl text-sm text-foreground placeholder-muted-foreground outline-none focus:border-muted-foreground/50 transition-colors dark:bg-zinc-900 dark:border-zinc-800 dark:text-white dark:placeholder-zinc-500 dark:focus:border-zinc-700"
                   disabled={loading}
                 />
               </div>
 
               <div className="space-y-2">
-                <label className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider">
+                <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">
                   {COPY.buyers.fields.phone}
                 </label>
                 <input
@@ -173,7 +173,7 @@ export function BuyerForm({
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   placeholder="514-555-0199"
-                  className="w-full px-4 py-2.5 bg-zinc-900 border border-zinc-800 rounded-xl text-sm text-white placeholder-zinc-500 outline-none focus:border-zinc-700 transition-colors"
+                  className="w-full px-4 py-2.5 bg-card border border-border rounded-xl text-sm text-foreground placeholder-muted-foreground outline-none focus:border-muted-foreground/50 transition-colors dark:bg-zinc-900 dark:border-zinc-800 dark:text-white dark:placeholder-zinc-500 dark:focus:border-zinc-700"
                   disabled={loading}
                 />
               </div>
@@ -182,13 +182,13 @@ export function BuyerForm({
 
           {/* Section 2: Investment Financials */}
           <div className="space-y-4">
-            <h3 className="text-sm font-bold text-zinc-300 uppercase tracking-wider">
+            <h3 className="text-sm font-bold text-foreground/80 uppercase tracking-wider">
               2. Budget & Capital
             </h3>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider">
+                <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">
                   Min Budget (CAD) *
                 </label>
                 <input
@@ -196,16 +196,16 @@ export function BuyerForm({
                   value={budgetMin === 0 ? "" : budgetMin}
                   onChange={(e) => setBudgetMin(Number(e.target.value))}
                   placeholder="e.g. 1000000"
-                  className="w-full px-4 py-2.5 bg-zinc-900 border border-zinc-800 rounded-xl text-sm text-white placeholder-zinc-500 outline-none focus:border-zinc-700 transition-colors [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  className="w-full px-4 py-2.5 bg-card border border-border rounded-xl text-sm text-foreground placeholder-muted-foreground outline-none focus:border-muted-foreground/50 transition-colors [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none dark:bg-zinc-900 dark:border-zinc-800 dark:text-white dark:placeholder-zinc-500 dark:focus:border-zinc-700"
                   disabled={loading}
                 />
-                <span className="text-[10px] text-zinc-500 font-semibold">
+                <span className="text-[10px] text-muted-foreground font-semibold">
                   {budgetMin > 0 ? `$${(budgetMin / 1000).toLocaleString()}k CAD` : "No minimum limit"}
                 </span>
               </div>
 
               <div className="space-y-2">
-                <label className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider">
+                <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">
                   Max Budget (CAD) *
                 </label>
                 <input
@@ -213,27 +213,27 @@ export function BuyerForm({
                   value={budgetMax === 0 ? "" : budgetMax}
                   onChange={(e) => setBudgetMax(Number(e.target.value))}
                   placeholder="e.g. 5000000"
-                  className="w-full px-4 py-2.5 bg-zinc-900 border border-zinc-800 rounded-xl text-sm text-white placeholder-zinc-500 outline-none focus:border-zinc-700 transition-colors [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  className="w-full px-4 py-2.5 bg-card border border-border rounded-xl text-sm text-foreground placeholder-muted-foreground outline-none focus:border-muted-foreground/50 transition-colors [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none dark:bg-zinc-900 dark:border-zinc-800 dark:text-white dark:placeholder-zinc-500 dark:focus:border-zinc-700"
                   disabled={loading}
                 />
-                <span className="text-[10px] text-zinc-500 font-semibold">
+                <span className="text-[10px] text-muted-foreground font-semibold">
                   {budgetMax > 0 ? `$${(budgetMax / 1_000_000).toFixed(1)}M CAD` : "$0.0M"}
                 </span>
               </div>
             </div>
 
             <div className="space-y-2">
-              <label className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider">
+              <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">
                 {COPY.buyers.fields.financing}
               </label>
               <select
                 value={financingType}
                 onChange={(e) => setFinancingType(e.target.value as "cash" | "financed" | "mixed" | "unknown")}
-                className="w-full px-4 py-2.5 bg-zinc-900 border border-zinc-800 rounded-xl text-sm text-white outline-none focus:border-zinc-700 transition-colors"
+                className="w-full px-4 py-2.5 bg-card border border-border rounded-xl text-sm text-foreground outline-none focus:border-muted-foreground/50 transition-colors dark:bg-zinc-900 dark:border-zinc-800 dark:text-white dark:focus:border-zinc-700"
                 disabled={loading}
               >
                 {FINANCING_TYPES.map((t) => (
-                  <option key={t.value} value={t.value} className="bg-zinc-950 text-white">
+                  <option key={t.value} value={t.value} className="bg-card text-foreground dark:bg-zinc-950 dark:text-white">
                     {t.label}
                   </option>
                 ))}
@@ -243,20 +243,20 @@ export function BuyerForm({
 
           {/* Section 3: Readiness Checklist */}
           <div className="space-y-4">
-            <h3 className="text-sm font-bold text-zinc-300 uppercase tracking-wider">
+            <h3 className="text-sm font-bold text-foreground/80 uppercase tracking-wider">
               3. Verification Checklist
             </h3>
 
-            <div className="bg-zinc-900/40 border border-zinc-900 p-5 rounded-2xl space-y-4">
+            <div className="bg-muted/40 border border-border p-5 rounded-2xl space-y-4 dark:bg-zinc-900/40 dark:border-zinc-900">
               <label className="flex items-center gap-3 cursor-pointer group">
                 <input
                   type="checkbox"
                   checked={proofOfFundsReviewed}
                   onChange={(e) => setProofOfFundsReviewed(e.target.checked)}
-                  className="h-4.5 w-4.5 bg-zinc-950 border-zinc-800 rounded focus:ring-0 text-amber-500"
+                  className="h-4.5 w-4.5 bg-card border-border rounded focus:ring-0 text-amber-500 dark:bg-zinc-950 dark:border-zinc-800"
                   disabled={loading}
                 />
-                <span className="text-xs font-semibold text-zinc-300 group-hover:text-zinc-100 transition-colors">
+                <span className="text-xs font-semibold text-muted-foreground group-hover:text-foreground transition-colors">
                   Proof of funds verified (Capital readiness)
                 </span>
               </label>
@@ -266,10 +266,10 @@ export function BuyerForm({
                   type="checkbox"
                   checked={ndaSigned}
                   onChange={(e) => setNdaSigned(e.target.checked)}
-                  className="h-4.5 w-4.5 bg-zinc-950 border-zinc-800 rounded focus:ring-0 text-amber-500"
+                  className="h-4.5 w-4.5 bg-card border-border rounded focus:ring-0 text-amber-500 dark:bg-zinc-950 dark:border-zinc-800"
                   disabled={loading}
                 />
-                <span className="text-xs font-semibold text-zinc-300 group-hover:text-zinc-100 transition-colors">
+                <span className="text-xs font-semibold text-muted-foreground group-hover:text-foreground transition-colors">
                   NDA signed (Active corporate non-disclosure)
                 </span>
               </label>
@@ -279,10 +279,10 @@ export function BuyerForm({
                   type="checkbox"
                   checked={backgroundCheckComplete}
                   onChange={(e) => setBackgroundCheckComplete(e.target.checked)}
-                  className="h-4.5 w-4.5 bg-zinc-950 border-zinc-800 rounded focus:ring-0 text-amber-500"
+                  className="h-4.5 w-4.5 bg-card border-border rounded focus:ring-0 text-amber-500 dark:bg-zinc-950 dark:border-zinc-800"
                   disabled={loading}
                 />
-                <span className="text-xs font-semibold text-zinc-300 group-hover:text-zinc-100 transition-colors">
+                <span className="text-xs font-semibold text-muted-foreground group-hover:text-foreground transition-colors">
                   Advisor background check completed
                 </span>
               </label>
@@ -295,7 +295,7 @@ export function BuyerForm({
           
           {/* Section 4: Sector Focus */}
           <div className="space-y-4">
-            <h3 className="text-sm font-bold text-zinc-300 uppercase tracking-wider">
+            <h3 className="text-sm font-bold text-foreground/80 uppercase tracking-wider">
               4. Sectors of Interest *
             </h3>
             
@@ -310,13 +310,13 @@ export function BuyerForm({
                     className={cn(
                       "flex items-center justify-between px-3.5 py-2.5 rounded-xl border text-xs font-semibold transition-all duration-300 select-none text-left",
                       checked 
-                        ? "bg-amber-500/10 text-amber-400 border-amber-500/20 shadow-md shadow-amber-500/5"
-                        : "bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-zinc-200"
+                        ? "bg-amber-500/10 text-amber-500 border-amber-500/20 shadow-sm dark:text-amber-400 dark:shadow-md dark:shadow-amber-500/5"
+                        : "bg-card border border-border text-muted-foreground hover:text-foreground hover:bg-muted dark:bg-zinc-900 dark:border-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200"
                     )}
                     disabled={loading}
                   >
                     <span>{s.label}</span>
-                    {checked && <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />}
+                    {checked && <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />}
                   </button>
                 );
               })}
@@ -325,7 +325,7 @@ export function BuyerForm({
 
           {/* Section 5: Geographic Focus */}
           <div className="space-y-4">
-            <h3 className="text-sm font-bold text-zinc-300 uppercase tracking-wider">
+            <h3 className="text-sm font-bold text-foreground/80 uppercase tracking-wider">
               5. Preferred Geographies *
             </h3>
             
@@ -340,13 +340,13 @@ export function BuyerForm({
                     className={cn(
                       "flex items-center justify-between px-3.5 py-2.5 rounded-xl border text-xs font-semibold transition-all duration-300 select-none text-left",
                       checked 
-                        ? "bg-amber-500/10 text-amber-400 border-amber-500/20 shadow-md shadow-amber-500/5"
-                        : "bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-zinc-200"
+                        ? "bg-amber-500/10 text-amber-500 border-amber-500/20 shadow-sm dark:text-amber-400 dark:shadow-md dark:shadow-amber-500/5"
+                        : "bg-card border border-border text-muted-foreground hover:text-foreground hover:bg-muted dark:bg-zinc-900 dark:border-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200"
                     )}
                     disabled={loading}
                   >
                     <span>{g.label}</span>
-                    {checked && <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />}
+                    {checked && <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />}
                   </button>
                 );
               })}
@@ -355,23 +355,23 @@ export function BuyerForm({
 
           {/* Section 6: Criteria Metrics */}
           <div className="space-y-4">
-            <h3 className="text-sm font-bold text-zinc-300 uppercase tracking-wider">
+            <h3 className="text-sm font-bold text-foreground/80 uppercase tracking-wider">
               6. Timeline & Experience
             </h3>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider">
+                <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">
                   Timeline
                 </label>
                 <select
                   value={acquisitionTimeline}
                   onChange={(e) => setAcquisitionTimeline(e.target.value as "0_6mo" | "6_12mo" | "12_24mo" | "24mo_plus")}
-                  className="w-full px-4 py-2.5 bg-zinc-900 border border-zinc-800 rounded-xl text-sm text-white outline-none focus:border-zinc-700 transition-colors"
+                  className="w-full px-4 py-2.5 bg-card border border-border rounded-xl text-sm text-foreground outline-none focus:border-muted-foreground/50 transition-colors dark:bg-zinc-900 dark:border-zinc-800 dark:text-white dark:focus:border-zinc-700"
                   disabled={loading}
                 >
                   {ACQUISITION_TIMELINE.map((t) => (
-                    <option key={t.value} value={t.value} className="bg-zinc-950 text-white">
+                    <option key={t.value} value={t.value} className="bg-card text-foreground dark:bg-zinc-950 dark:text-white">
                       {t.label}
                     </option>
                   ))}
@@ -379,17 +379,17 @@ export function BuyerForm({
               </div>
 
               <div className="space-y-2">
-                <label className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider">
+                <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">
                   Experience
                 </label>
                 <select
                   value={acquisitionExperience}
                   onChange={(e) => setAcquisitionExperience(e.target.value as "first_time" | "experienced" | "serial")}
-                  className="w-full px-4 py-2.5 bg-zinc-900 border border-zinc-800 rounded-xl text-sm text-white outline-none focus:border-zinc-700 transition-colors"
+                  className="w-full px-4 py-2.5 bg-card border border-border rounded-xl text-sm text-foreground outline-none focus:border-muted-foreground/50 transition-colors dark:bg-zinc-900 dark:border-zinc-800 dark:text-white dark:focus:border-zinc-700"
                   disabled={loading}
                 >
                   {ACQUISITION_EXPERIENCE.map((exp) => (
-                    <option key={exp.value} value={exp.value} className="bg-zinc-950 text-white">
+                    <option key={exp.value} value={exp.value} className="bg-card text-foreground dark:bg-zinc-950 dark:text-white">
                       {exp.label}
                     </option>
                   ))}
@@ -402,24 +402,24 @@ export function BuyerForm({
 
       {/* Section 7: Notes */}
       <div className="space-y-2 max-w-4xl">
-        <label className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider">
+        <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">
           {COPY.buyers.fields.notes}
         </label>
         <textarea
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
           placeholder="Enter confidential background details, notes about conversation with the buyer..."
-          className="w-full h-32 px-4 py-3 bg-zinc-900 border border-zinc-800 rounded-xl text-sm text-white placeholder-zinc-500 outline-none focus:border-zinc-700 transition-colors resize-none"
+          className="w-full h-32 px-4 py-3 bg-card border border-border rounded-xl text-sm text-foreground placeholder-muted-foreground outline-none focus:border-muted-foreground/50 transition-colors resize-none dark:bg-zinc-900 dark:border-zinc-800 dark:text-white dark:placeholder-zinc-500 dark:focus:border-zinc-700"
           disabled={loading}
         />
       </div>
 
       {/* Action Buttons */}
-      <div className="flex items-center justify-end gap-3 pt-4 border-t border-zinc-900 max-w-4xl">
+      <div className="flex items-center justify-end gap-3 pt-4 border-t border-border max-w-4xl">
         <button
           type="button"
           onClick={onCancel}
-          className="px-5 py-2.5 bg-zinc-950 border border-zinc-900 hover:border-zinc-800 rounded-xl text-xs font-bold text-zinc-400 hover:text-zinc-200 transition-all duration-300"
+          className="px-5 py-2.5 bg-card border border-border hover:bg-muted rounded-xl text-xs font-bold text-muted-foreground hover:text-foreground transition-all duration-300"
           disabled={loading}
         >
           {COPY.common.cancel}
