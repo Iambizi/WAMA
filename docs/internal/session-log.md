@@ -28,6 +28,20 @@
 
 ---
 
+## Session 11 — 2026-06-28
+**Agent:** Antigravity
+**Step:** Step 7 — Polish (Model Version Update)
+**Status:** ✅ Complete
+
+### What Was Done
+- **Updated Anthropic Claude API model identifier**: Swapped `claude-3-5-sonnet-20241022` with the latest balanced standard model identifier `claude-sonnet-4-6` in `app/api/match/route.ts`.
+- **Synchronized documentation specs**: Updated mock model API parameters in `docs/internal/wama-tech-spec.md` to ensure design spec alignment.
+
+### Next Steps
+- Continue with client demo.
+
+---
+
 ## Session 10 — 2026-05-30
 **Agent:** Antigravity
 **Step:** Step 7 — Polish (Form Styling & Theme Integration)
