@@ -108,6 +108,7 @@ export const upsertFromAI = mutation({
         aiReasoning,
         aiMatchedCriteria,
         status: "suggested",
+        buyerAccessStatus: "hidden",
         createdAt: now,
         updatedAt: now,
       });
@@ -191,7 +192,7 @@ export const getPopulated = query({
   },
 });
 
-// Update match pipeline status and/or advisor notes
+// Update match pipeline status, advisor notes, and/or buyer access visibility
 export const updateStatus = mutation({
   args: {
     id: v.id("matches"),
@@ -207,6 +208,15 @@ export const updateStatus = mutation({
       v.literal("rejected")
     ),
     advisorNotes: v.optional(v.string()),
+    buyerAccessStatus: v.optional(
+      v.union(
+        v.literal("hidden"),
+        v.literal("teaser_shared"),
+        v.literal("nda_required"),
+        v.literal("intro_approved"),
+        v.literal("introduced")
+      )
+    ),
   },
   handler: async (
     ctx: MutationCtx,
@@ -223,6 +233,7 @@ export const updateStatus = mutation({
         | "closed_lost"
         | "rejected";
       advisorNotes?: string;
+      buyerAccessStatus?: "hidden" | "teaser_shared" | "nda_required" | "intro_approved" | "introduced";
     }
   ) => {
     await requireAdvisor(ctx);
@@ -235,6 +246,7 @@ export const updateStatus = mutation({
     await ctx.db.patch(args.id, {
       status: args.status,
       advisorNotes: args.advisorNotes !== undefined ? args.advisorNotes : existing.advisorNotes,
+      buyerAccessStatus: args.buyerAccessStatus !== undefined ? args.buyerAccessStatus : (existing.buyerAccessStatus || "hidden"),
       updatedAt: now,
     });
 
@@ -260,5 +272,59 @@ export const updateStatus = mutation({
     });
 
     return args.id;
+  },
+});
+
+// List populated matches for the buyer portal, excluding hidden matches and raw seller contact info
+export const listPopulatedForBuyer = query({
+  args: {},
+  handler: async (ctx: QueryCtx) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) return [];
+
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_clerk_id", (q) => q.eq("clerkId", identity.subject))
+      .unique();
+
+    if (!user || user.role !== "buyer") return [];
+
+    const buyer = await ctx.db
+      .query("buyers")
+      .withIndex("by_user_id", (q) => q.eq("userId", user._id))
+      .unique();
+
+    if (!buyer) return [];
+
+    const matches = await ctx.db
+      .query("matches")
+      .withIndex("by_buyer", (q) => q.eq("buyerId", buyer._id))
+      .collect();
+
+    // Filter to matches where access status is NOT hidden
+    const visibleMatches = matches.filter(
+      (m) => m.buyerAccessStatus && m.buyerAccessStatus !== "hidden"
+    );
+
+    // Populate de-identified seller details for buyer review
+    const populated = await Promise.all(
+      visibleMatches.map(async (m) => {
+        const seller = await ctx.db.get(m.sellerId);
+        return {
+          ...m,
+          sellerBusinessName: "Confidential Project", // Exclude raw names to preserve anonymity
+          sellerSector: seller?.sector || "",
+          sellerGeography: seller?.geography || "",
+          sellerRevenueRange: seller?.revenueRange || "under_500k",
+          sellerEbitdaRange: seller?.ebitdaRange || "under_100k",
+          sellerEmployeeCount: seller?.employeeCount || "1_5",
+          sellerYearsInOperation: seller?.yearsInOperation ?? 0,
+          sellerTransactionType: seller?.transactionType || "full_sale",
+          sellerReasonForSale: seller?.reasonForSale || "",
+        };
+      })
+    );
+
+    return populated;
   },
 });

@@ -44,10 +44,11 @@ export default defineSchema({
     ),
 
     // Internal
+    userId: v.optional(v.id("users")),
     notes: v.optional(v.string()),
     createdAt: v.number(),
     updatedAt: v.number(),
-  }),
+  }).index("by_user_id", ["userId"]),
 
   sellers: defineTable({
     // Identity (advisor-entered, not exposed to AI)
@@ -105,10 +106,11 @@ export default defineSchema({
     readinessScore: v.optional(v.number()),  // 0–100, computed from checklist
 
     // Internal
+    userId: v.optional(v.id("users")),
     notes: v.optional(v.string()),
     createdAt: v.number(),
     updatedAt: v.number(),
-  }),
+  }).index("by_user_id", ["userId"]),
 
   matches: defineTable({
     sellerId: v.id("sellers"),
@@ -132,6 +134,15 @@ export default defineSchema({
       v.literal("rejected")          // Advisor rejected the match
     ),
 
+    buyerAccessStatus: v.optional(
+      v.union(
+        v.literal("hidden"),
+        v.literal("teaser_shared"),
+        v.literal("nda_required"),
+        v.literal("intro_approved"),
+        v.literal("introduced")
+      )
+    ),
     advisorNotes: v.optional(v.string()),
     createdAt: v.number(),
     updatedAt: v.number(),
@@ -150,4 +161,21 @@ export default defineSchema({
     details: v.optional(v.string()), // e.g. "status: pending → qualified"
     createdAt: v.number(),
   }).index("by_created_at", ["createdAt"]),
+
+  users: defineTable({
+    clerkId: v.string(),
+    email: v.string(),
+    name: v.optional(v.string()),
+    role: v.union(v.literal("admin"), v.literal("buyer"), v.literal("seller"), v.literal("unassigned")),
+    onboardingIntent: v.union(v.literal("buyer"), v.literal("seller"), v.null()),
+    onboardingStatus: v.union(
+      v.literal("not_started"),
+      v.literal("in_progress"),
+      v.literal("submitted"),
+      v.literal("approved"),
+      v.literal("rejected")
+    ),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  }).index("by_clerk_id", ["clerkId"]),
 });

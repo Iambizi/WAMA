@@ -30,16 +30,54 @@ export const list = query({
   },
 });
 
-// Get a single seller by ID
+// Get a single seller by ID (Enforces role-based permissions)
 export const get = query({
   args: { id: v.id("sellers") },
   handler: async (ctx: QueryCtx, args) => {
-    await requireAdvisor(ctx);
-    return await ctx.db.get(args.id);
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Unauthorized");
+
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_clerk_id", (q) => q.eq("clerkId", identity.subject))
+      .unique();
+
+    if (!user) throw new Error("Unauthorized");
+
+    const seller = await ctx.db.get(args.id);
+    if (!seller) return null;
+
+    // Admin can access all profiles; Sellers can only access their own linked profile
+    if (user.role !== "admin" && seller.userId !== user._id) {
+      throw new Error("Forbidden: Access denied");
+    }
+
+    return seller;
   },
 });
 
-// Create a new seller mandate
+// Get the active seller profile linked to the logged-in user session
+export const currentSeller = query({
+  args: {},
+  handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) return null;
+
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_clerk_id", (q) => q.eq("clerkId", identity.subject))
+      .unique();
+
+    if (!user) return null;
+
+    return await ctx.db
+      .query("sellers")
+      .withIndex("by_user_id", (q) => q.eq("userId", user._id))
+      .unique();
+  },
+});
+
+// Create a new seller mandate (Linked to active user if self-onboarding)
 export const create = mutation({
   args: {
     name: v.string(),
@@ -107,17 +145,40 @@ export const create = mutation({
       notes?: string;
     }
   ) => {
-    await requireAdvisor(ctx);
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Unauthorized");
+
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_clerk_id", (q) => q.eq("clerkId", identity.subject))
+      .unique();
+
+    if (!user) throw new Error("Unauthorized");
+
+    const isAdmin = user.role === "admin";
+    const userIdToLink = isAdmin ? undefined : user._id;
+
     const now = Date.now();
     const readinessScore = computeReadinessScore(args);
 
     const id = await ctx.db.insert("sellers", {
       ...args,
+      userId: userIdToLink,
       qualificationStatus: "pending",
       readinessScore,
       createdAt: now,
       updatedAt: now,
     });
+
+    // If a self-onboarding seller, update their registration role and status in users collection
+    if (!isAdmin) {
+      await ctx.db.patch(user._id, {
+        role: "seller",
+        onboardingIntent: "seller",
+        onboardingStatus: "submitted",
+        updatedAt: now,
+      });
+    }
 
     // Log the creation activity
     await ctx.db.insert("activityLogs", {
@@ -125,7 +186,7 @@ export const create = mutation({
       entityType: "seller",
       entityId: id,
       entityLabel: args.businessName,
-      details: `Readiness Score: ${readinessScore}%`,
+      details: isAdmin ? `Manually entered by Advisor (Readiness: ${readinessScore}%)` : `Submitted via self-onboarding portal (Readiness: ${readinessScore}%)`,
       createdAt: now,
     });
 
@@ -203,13 +264,27 @@ export const update = mutation({
       notes?: string;
     }
   ) => {
-    await requireAdvisor(ctx);
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Unauthorized");
+
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_clerk_id", (q) => q.eq("clerkId", identity.subject))
+      .unique();
+
+    if (!user) throw new Error("Unauthorized");
+
     const { id, ...fields } = args;
     const now = Date.now();
 
     const existing = await ctx.db.get(id);
     if (!existing) {
       throw new Error("Seller mandate not found");
+    }
+
+    const isAdmin = user.role === "admin";
+    if (!isAdmin && existing.userId !== user._id) {
+      throw new Error("Forbidden: Access denied");
     }
 
     const readinessScore = computeReadinessScore(fields);
@@ -226,7 +301,7 @@ export const update = mutation({
       entityType: "seller",
       entityId: id,
       entityLabel: fields.businessName,
-      details: `Updated profile (Readiness: ${readinessScore}%)`,
+      details: isAdmin ? `Updated profile by advisor (Readiness: ${readinessScore}%)` : `Updated profile by seller (Readiness: ${readinessScore}%)`,
       createdAt: now,
     });
 

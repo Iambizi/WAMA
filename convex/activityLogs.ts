@@ -5,9 +5,32 @@ import { mutation, query, QueryCtx, MutationCtx } from "./_generated/server";
 export async function requireAdvisor(ctx: QueryCtx | MutationCtx) {
   const identity = await ctx.auth.getUserIdentity();
   if (!identity) {
-    throw new Error("Unauthorized");
+    throw new Error("Unauthorized: Identity context missing");
   }
-  return identity;
+
+  // Check if user is registered in the database and has the "admin" role
+  const user = await ctx.db
+    .query("users")
+    .withIndex("by_clerk_id", (q) => q.eq("clerkId", identity.subject))
+    .unique();
+
+  if (user && user.role === "admin") {
+    return identity;
+  }
+
+  // Direct environment allowlist check as a fallback (helpful for first login before syncing)
+  const adminEmailsEnv = process.env.ADMIN_EMAILS || "";
+  const adminEmails = adminEmailsEnv
+    .split(",")
+    .map((email) => email.trim().toLowerCase())
+    .filter(Boolean);
+
+  const userEmail = identity.email?.toLowerCase() || "";
+  if (adminEmails.includes(userEmail)) {
+    return identity;
+  }
+
+  throw new Error("Forbidden: Admin privileges required");
 }
 
 // Query to list the latest 20 activity logs for the dashboard

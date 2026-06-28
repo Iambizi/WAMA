@@ -13,6 +13,7 @@ import type * as buyers from "../buyers.js";
 import type * as dashboard from "../dashboard.js";
 import type * as matches from "../matches.js";
 import type * as sellers from "../sellers.js";
+import type * as users from "../users.js";
 
 import type {
   ApiFromModules,
@@ -26,6 +27,7 @@ declare const fullApi: ApiFromModules<{
   dashboard: typeof dashboard;
   matches: typeof matches;
   sellers: typeof sellers;
+  users: typeof users;
 }>;
 
 /**

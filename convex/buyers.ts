@@ -11,16 +11,54 @@ export const list = query({
   },
 });
 
-// Get a single buyer by ID
+// Get a single buyer by ID (Enforces role-based permissions)
 export const get = query({
   args: { id: v.id("buyers") },
   handler: async (ctx, args) => {
-    await requireAdvisor(ctx);
-    return await ctx.db.get(args.id);
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Unauthorized");
+
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_clerk_id", (q) => q.eq("clerkId", identity.subject))
+      .unique();
+
+    if (!user) throw new Error("Unauthorized");
+
+    const buyer = await ctx.db.get(args.id);
+    if (!buyer) return null;
+
+    // Admin can access all profiles; Buyers can only access their own linked profile
+    if (user.role !== "admin" && buyer.userId !== user._id) {
+      throw new Error("Forbidden: Access denied");
+    }
+
+    return buyer;
   },
 });
 
-// Create a new buyer
+// Get the active buyer profile linked to the logged-in user session
+export const currentBuyer = query({
+  args: {},
+  handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) return null;
+
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_clerk_id", (q) => q.eq("clerkId", identity.subject))
+      .unique();
+
+    if (!user) return null;
+
+    return await ctx.db
+      .query("buyers")
+      .withIndex("by_user_id", (q) => q.eq("userId", user._id))
+      .unique();
+  },
+});
+
+// Create a new buyer (Linked to active user if self-onboarding)
 export const create = mutation({
   args: {
     name: v.string(),
@@ -53,15 +91,38 @@ export const create = mutation({
     notes: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    await requireAdvisor(ctx);
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Unauthorized");
+
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_clerk_id", (q) => q.eq("clerkId", identity.subject))
+      .unique();
+
+    if (!user) throw new Error("Unauthorized");
+
+    const isAdmin = user.role === "admin";
+    const userIdToLink = isAdmin ? undefined : user._id;
+
     const now = Date.now();
     
     const id = await ctx.db.insert("buyers", {
       ...args,
+      userId: userIdToLink,
       qualificationStatus: "pending",
       createdAt: now,
       updatedAt: now,
     });
+
+    // If a self-onboarding buyer, update their registration role and status in users collection
+    if (!isAdmin) {
+      await ctx.db.patch(user._id, {
+        role: "buyer",
+        onboardingIntent: "buyer",
+        onboardingStatus: "submitted",
+        updatedAt: now,
+      });
+    }
 
     // Log the creation
     await ctx.db.insert("activityLogs", {
@@ -69,7 +130,7 @@ export const create = mutation({
       entityType: "buyer",
       entityId: id,
       entityLabel: args.name,
-      details: `Budget: $${(args.budgetMin / 1_000_000).toFixed(1)}M - $${(args.budgetMax / 1_000_000).toFixed(1)}M CAD`,
+      details: isAdmin ? `Manually entered by Advisor` : `Submitted via self-onboarding portal`,
       createdAt: now,
     });
 
@@ -111,13 +172,27 @@ export const update = mutation({
     notes: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    await requireAdvisor(ctx);
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Unauthorized");
+
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_clerk_id", (q) => q.eq("clerkId", identity.subject))
+      .unique();
+
+    if (!user) throw new Error("Unauthorized");
+
     const { id, ...fields } = args;
     const now = Date.now();
 
     const existing = await ctx.db.get(id);
     if (!existing) {
       throw new Error("Buyer not found");
+    }
+
+    const isAdmin = user.role === "admin";
+    if (!isAdmin && existing.userId !== user._id) {
+      throw new Error("Forbidden: Access denied");
     }
 
     await ctx.db.patch(id, {
@@ -131,7 +206,7 @@ export const update = mutation({
       entityType: "buyer",
       entityId: id,
       entityLabel: args.name,
-      details: "Profile fields updated by advisor",
+      details: isAdmin ? "Profile fields updated by advisor" : "Profile fields updated by buyer user",
       createdAt: now,
     });
 

@@ -42,11 +42,6 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  // Prevent hydration flicker by keeping default body background matching
-  if (!mounted) {
-    return <>{children}</>;
-  }
-
   return (
     <ThemeContext.Provider value={{ theme, toggleTheme }}>
       {children}
