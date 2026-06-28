@@ -2,8 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { ConvexHttpClient } from "convex/browser";
 import { api } from "@/convex/_generated/api";
-import Anthropic from "@anthropic-ai/sdk";
 import { Id } from "@/convex/_generated/dataModel";
+import { generateObject } from "ai";
+import { createAnthropic } from "@ai-sdk/anthropic";
+import { createOpenAI } from "@ai-sdk/openai";
+import { z } from "zod";
 
 export async function POST(req: NextRequest) {
   try {
@@ -121,28 +124,56 @@ ${sanitizedBuyers.map((b) => `
 
 Return the top matches ranked by score descending. Include all buyers with a score above 30.`;
 
-    // 6. Initialize Anthropic Claude API client
-    const anthropic = new Anthropic({
-      apiKey: process.env.ANTHROPIC_API_KEY,
-    });
+    // 6. Initialize model dynamically based on environment configuration
+    const provider = process.env.AI_PROVIDER || "anthropic";
+    const rawModelName = process.env.AI_MODEL;
 
-    const msg = await anthropic.messages.create({
-      model: "claude-sonnet-4-6",
-      max_tokens: 2048,
+    let model;
+
+    if (provider === "openai") {
+      const apiKey = process.env.OPENROUTER_API_KEY || process.env.OPENAI_API_KEY;
+      if (!apiKey) {
+        throw new Error("Missing OpenAI or OpenRouter API key in environment variables.");
+      }
+
+      const isOpenRouter = !!process.env.OPENROUTER_API_KEY;
+      const openaiProvider = createOpenAI({
+        baseURL: isOpenRouter ? "https://openrouter.ai/api/v1" : undefined,
+        apiKey: apiKey,
+      });
+
+      model = openaiProvider(rawModelName || (isOpenRouter ? "meta-llama/llama-3-70b-instruct" : "gpt-4o"));
+    } else {
+      // Default: Anthropic
+      const apiKey = process.env.ANTHROPIC_API_KEY;
+      if (!apiKey) {
+        throw new Error("Missing Anthropic API key in environment variables.");
+      }
+
+      const anthropicProvider = createAnthropic({
+        apiKey: apiKey,
+      });
+
+      model = anthropicProvider(rawModelName || "claude-sonnet-4-6");
+    }
+
+    // Execute de-identified matching using the Vercel AI SDK generateObject
+    const { object: parsedData } = await generateObject({
+      model: model,
+      schema: z.object({
+        matches: z.array(
+          z.object({
+            buyerRef: z.string().describe("The 6-character shortened reference of the buyer"),
+            score: z.number().min(0).max(100).describe("Fit score from 0 to 100"),
+            reasoning: z.string().describe("2-3 sentences explaining why this buyer fits the seller"),
+            matchedCriteria: z.array(z.string()).describe("Specific fields that matched, e.g., 'sector', 'budget', 'geography', 'timeline'"),
+          })
+        ),
+      }),
       system: systemPrompt,
-      messages: [{ role: "user", content: userPrompt }],
+      prompt: userPrompt,
     });
 
-    const rawOutput = msg.content[0].type === "text" ? msg.content[0].text : "";
-
-    // Clean JSON response (strip any accidental markdown block wrapper backticks if Claude includes them)
-    const jsonString = rawOutput.includes("```json")
-      ? rawOutput.split("```json")[1].split("```")[0].trim()
-      : rawOutput.includes("```")
-        ? rawOutput.split("```")[1].split("```")[0].trim()
-        : rawOutput.trim();
-
-    const parsedData = JSON.parse(jsonString);
     const matchesResult = parsedData.matches || [];
 
     // 7. Loop through match proposals and upsert into the Convex database

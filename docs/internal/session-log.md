@@ -28,6 +28,21 @@
 
 ---
 
+## Session 12 — 2026-06-28
+**Agent:** Antigravity
+**Step:** Step 7 — Polish (Vercel AI SDK Integration)
+**Status:** ✅ Complete
+
+### What Was Done
+- **Integrated Vercel AI SDK**: Replaced the direct, proprietary Anthropic SDK dependency with the Vercel AI SDK (`ai` core plus `@ai-sdk/anthropic` and `@ai-sdk/openai`).
+- **Implemented Dynamic AI Provider Routing**: Enabled dynamic runtime AI provider switching using environment variables (`AI_PROVIDER` and `AI_MODEL`) supporting both Anthropic Claude, OpenAI, and gateway services like OpenRouter.
+- **Upgraded to Schema-Guaranteed Object Generation**: Swapped message prompts for Vercel's `generateObject` parser with strict Zod schema enforcement. This guarantees valid, structured matches JSON responses and eliminates regex cleaning code.
+
+### Next Steps
+- Continue with client demo.
+
+---
+
 ## Session 11 — 2026-06-28
 **Agent:** Antigravity
 **Step:** Step 7 — Polish (Model Version Update)
