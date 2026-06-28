@@ -28,6 +28,27 @@
 
 ---
 
+## Session 13 — 2026-06-28
+**Agent:** Antigravity
+**Step:** Step 7 — Polish (Onboarding & Role Alignment)
+**Status:** ✅ Complete
+
+### What Was Done
+- **Added Users Schema and Clerk Syncing**: Created a `users` Convex table to track registered Clerk accounts, user roles (`admin`, `buyer`, `seller`, `unassigned`), and onboarding intents/status states. Added sync mutations and triggers.
+- **Implemented Next.js Route Groups**: Structured the application into public pages (`app/(public)`), portal client pages (`app/(portal)`), and admin pages (`app/(admin)`). Removed the global layout/sidebar wrapper lock from the client provider.
+- **Created Onboarding Flows and Portals**: Converted existing profile creation wizards into singular client onboarding routes (`/seller/intake` and `/buyer/apply`) and added lightweight dashboards.
+- **Hardened Server-Side Authorization**: Enforced permission rules inside Convex queries and mutations to prevent data exposure between roles.
+
+### Decisions Made
+- Added a `buyerAccessStatus` field to `matches` to explicitly toggle match visibility to buyers rather than using general match pipeline statuses.
+- Excluded raw seller names and contact info from buyer match listings.
+- Restricted the seller portal to progress indicators instead of raw numerical readiness scores to prevent misinterpretation.
+
+### Next Steps
+- Run the demo session with William and evaluate feedback.
+
+---
+
 ## Session 12 — 2026-06-28
 **Agent:** Antigravity
 **Step:** Step 7 — Polish (Vercel AI SDK Integration)
