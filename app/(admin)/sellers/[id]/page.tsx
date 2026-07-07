@@ -149,23 +149,23 @@ export default function SellerProfile() {
           <span>Back to sellers list</span>
         </Link>
 
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 bg-zinc-900/20 border border-zinc-900 p-6 rounded-2xl">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 bg-card border border-border p-6 rounded-2xl shadow-sm">
           <div className="flex items-start gap-4">
-            <div className="p-3 bg-zinc-900 border border-zinc-800 rounded-2xl hidden sm:block shrink-0">
-              <Building className="h-6 w-6 text-zinc-400" />
+            <div className="p-3 bg-muted border border-border rounded-2xl hidden sm:block shrink-0">
+              <Building className="h-6 w-6 text-muted-foreground" />
             </div>
             <div className="space-y-2">
               <div className="flex flex-wrap items-center gap-3">
-                <h1 className="text-xl font-bold tracking-tight text-white sm:text-2xl">
+                <h1 className="text-xl font-bold tracking-tight text-foreground sm:text-2xl">
                   {seller.businessName}
                 </h1>
                 <span
                   className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider rounded-md border ${
                     seller.qualificationStatus === "qualified"
-                      ? "bg-emerald-500/5 text-emerald-400 border-emerald-500/10"
+                      ? "bg-emerald-500/5 text-emerald-500 border-emerald-500/10"
                       : seller.qualificationStatus === "disqualified"
-                        ? "bg-rose-500/5 text-rose-400 border-rose-500/10"
-                        : "bg-zinc-800 text-zinc-400 border-zinc-800"
+                        ? "bg-rose-500/5 text-rose-500 border-rose-500/10"
+                        : "bg-muted text-muted-foreground border-border"
                   }`}
                 >
                   {seller.qualificationStatus === "qualified" 
@@ -175,18 +175,18 @@ export default function SellerProfile() {
                       : "Pending Review"}
                 </span>
               </div>
-              <div className="flex flex-wrap gap-x-4 gap-y-1.5 text-xs text-zinc-400">
-                <span className="font-semibold text-zinc-300">Owner: {seller.name}</span>
-                <span className="text-zinc-600">|</span>
-                <a href={`mailto:${seller.email}`} className="flex items-center gap-1.5 hover:text-zinc-200 transition-colors">
-                  <Mail className="h-3.5 w-3.5 text-zinc-500" />
+              <div className="flex flex-wrap gap-x-4 gap-y-1.5 text-xs text-muted-foreground">
+                <span className="font-semibold text-foreground">Owner: {seller.name}</span>
+                <span className="text-border">|</span>
+                <a href={`mailto:${seller.email}`} className="flex items-center gap-1.5 hover:text-foreground transition-colors text-muted-foreground">
+                  <Mail className="h-3.5 w-3.5 text-muted-foreground" />
                   <span>{seller.email}</span>
                 </a>
                 {seller.phone && (
                   <>
-                    <span className="text-zinc-600">|</span>
-                    <span className="flex items-center gap-1.5">
-                      <Phone className="h-3.5 w-3.5 text-zinc-500" />
+                    <span className="text-border">|</span>
+                    <span className="flex items-center gap-1.5 text-muted-foreground">
+                      <Phone className="h-3.5 w-3.5 text-muted-foreground" />
                       <span>{seller.phone}</span>
                     </span>
                   </>
@@ -201,11 +201,11 @@ export default function SellerProfile() {
               <button
                 onClick={handleGenerateMatches}
                 disabled={generatingMatches}
-                className="flex items-center gap-2 px-4 py-2 bg-amber-500 hover:bg-amber-600 disabled:bg-zinc-800 disabled:text-zinc-500 text-zinc-950 rounded-xl text-xs font-bold transition-all duration-300 shadow-md shadow-amber-500/10 cursor-pointer disabled:cursor-not-allowed"
+                className="flex items-center gap-2 px-4 py-2 bg-amber-500 hover:bg-amber-600 disabled:bg-muted disabled:text-muted-foreground text-zinc-950 rounded-xl text-xs font-bold transition-all duration-300 shadow-md shadow-amber-500/10 cursor-pointer disabled:cursor-not-allowed"
               >
                 {generatingMatches ? (
                   <>
-                    <Loader2 className="h-4 w-4 animate-spin text-zinc-950" />
+                    <Loader2 className="h-4 w-4 animate-spin text-current" />
                     <span>{COPY.matches.generating}</span>
                   </>
                 ) : (
@@ -218,8 +218,8 @@ export default function SellerProfile() {
             )}
 
             {/* Status Mutation Select */}
-            <div className="flex items-center bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-1.5 gap-2">
-              <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
+            <div className="flex items-center bg-card border border-border rounded-xl px-3 py-1.5 gap-2">
+              <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
                 Status
               </label>
               {updatingStatus ? (
@@ -228,20 +228,20 @@ export default function SellerProfile() {
                 <select
                   value={seller.qualificationStatus}
                   onChange={handleStatusChange}
-                  className="bg-transparent text-xs font-semibold text-white outline-none cursor-pointer"
+                  className="bg-transparent text-xs font-semibold text-foreground outline-none cursor-pointer"
                 >
-                  <option value="pending" className="bg-zinc-950 text-zinc-300">Pending Review</option>
-                  <option value="qualified" className="bg-zinc-950 text-emerald-400">Qualified</option>
-                  <option value="disqualified" className="bg-zinc-950 text-rose-400">Disqualified</option>
+                  <option value="pending" className="bg-popover text-muted-foreground">Pending Review</option>
+                  <option value="qualified" className="bg-popover text-emerald-500">Qualified</option>
+                  <option value="disqualified" className="bg-popover text-rose-500">Disqualified</option>
                 </select>
               )}
             </div>
 
             <button
               onClick={() => setIsEditing(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-zinc-900 hover:bg-zinc-800/80 border border-zinc-800 hover:border-zinc-700 rounded-xl text-xs font-semibold text-zinc-200 transition-all duration-300"
+              className="flex items-center gap-2 px-4 py-2 bg-card hover:bg-muted border border-border rounded-xl text-xs font-semibold text-foreground transition-all duration-300"
             >
-              <Edit className="h-4 w-4 text-zinc-400" />
+              <Edit className="h-4 w-4 text-muted-foreground" />
               <span>Edit Mandate</span>
             </button>
           </div>
@@ -255,33 +255,33 @@ export default function SellerProfile() {
         <div className="lg:col-span-2 space-y-8">
           
           {/* Card 1: Mandate Financial Parameters */}
-          <div className="bg-zinc-900/30 border border-zinc-900 rounded-2xl p-6 space-y-6">
-            <h2 className="text-sm font-bold text-zinc-300 uppercase tracking-wider flex items-center gap-2.5">
+          <div className="bg-card border border-border rounded-2xl p-6 space-y-6 shadow-sm">
+            <h2 className="text-sm font-bold text-foreground uppercase tracking-wider flex items-center gap-2.5">
               <DollarSign className="h-4.5 w-4.5 text-amber-500" />
               <span>Mandate Metrics</span>
             </h2>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              <div className="space-y-1.5 p-4 bg-zinc-950/40 border border-zinc-900/60 rounded-xl">
-                <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">
+              <div className="space-y-1.5 p-4 bg-muted/40 border border-border/80 rounded-xl">
+                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
                   {COPY.sellers.fields.revenueRange}
                 </span>
-                <p className="text-lg font-bold text-white">
+                <p className="text-lg font-bold text-foreground">
                   {revenueLabel}
                 </p>
-                <div className="w-full bg-zinc-900 h-1.5 rounded-full overflow-hidden mt-2.5">
+                <div className="w-full bg-muted h-1.5 rounded-full overflow-hidden mt-2.5">
                   <div className="bg-gradient-to-r from-amber-500 to-yellow-400 h-full w-2/3 rounded-full" />
                 </div>
               </div>
 
-              <div className="space-y-1.5 p-4 bg-zinc-950/40 border border-zinc-900/60 rounded-xl">
-                <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">
+              <div className="space-y-1.5 p-4 bg-muted/40 border border-border/80 rounded-xl">
+                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
                   {COPY.sellers.fields.ebitdaRange}
                 </span>
-                <p className="text-lg font-bold text-zinc-200">
+                <p className="text-lg font-bold text-foreground">
                   {ebitdaLabel}
                 </p>
-                <div className="w-full bg-zinc-900 h-1.5 rounded-full overflow-hidden mt-2.5">
+                <div className="w-full bg-muted h-1.5 rounded-full overflow-hidden mt-2.5">
                   <div className="bg-gradient-to-r from-emerald-500 to-teal-400 h-full w-1/2 rounded-full" />
                 </div>
               </div>
@@ -289,51 +289,51 @@ export default function SellerProfile() {
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
               <div className="space-y-1.5">
-                <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider flex items-center gap-1.5">
-                  <Building className="h-3.5 w-3.5 text-zinc-400" />
+                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
+                  <Building className="h-3.5 w-3.5 text-muted-foreground" />
                   <span>{COPY.sellers.fields.sector}</span>
                 </span>
-                <p className="text-xs font-semibold text-zinc-300 bg-zinc-900/40 border border-zinc-900 px-3.5 py-2.5 rounded-xl">
+                <p className="text-xs font-semibold text-foreground bg-muted/20 border border-border px-3.5 py-2.5 rounded-xl">
                   {sectorLabel}
                 </p>
               </div>
 
               <div className="space-y-1.5">
-                <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider flex items-center gap-1.5">
-                  <Globe className="h-3.5 w-3.5 text-zinc-400" />
+                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
+                  <Globe className="h-3.5 w-3.5 text-muted-foreground" />
                   <span>{COPY.sellers.fields.geography}</span>
                 </span>
-                <p className="text-xs font-semibold text-zinc-300 bg-zinc-900/40 border border-zinc-900 px-3.5 py-2.5 rounded-xl">
+                <p className="text-xs font-semibold text-foreground bg-muted/20 border border-border px-3.5 py-2.5 rounded-xl">
                   {geographyLabel}
                 </p>
               </div>
 
               <div className="space-y-1.5">
-                <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider flex items-center gap-1.5">
-                  <Briefcase className="h-3.5 w-3.5 text-zinc-400" />
+                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
+                  <Briefcase className="h-3.5 w-3.5 text-muted-foreground" />
                   <span>{COPY.sellers.fields.transactionType}</span>
                 </span>
-                <p className="text-xs font-semibold text-zinc-300 bg-zinc-900/40 border border-zinc-900 px-3.5 py-2.5 rounded-xl">
+                <p className="text-xs font-semibold text-foreground bg-muted/20 border border-border px-3.5 py-2.5 rounded-xl">
                   {transactionLabel}
                 </p>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-4 border-t border-zinc-900/60">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-4 border-t border-border">
               <div className="space-y-1.5">
-                <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">
+                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
                   {COPY.sellers.fields.employeeCount}
                 </span>
-                <p className="text-xs font-semibold text-zinc-300 bg-zinc-900/40 border border-zinc-900 px-3.5 py-2.5 rounded-xl">
+                <p className="text-xs font-semibold text-foreground bg-muted/20 border border-border px-3.5 py-2.5 rounded-xl">
                   {employeeLabel}
                 </p>
               </div>
 
               <div className="space-y-1.5">
-                <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">
+                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
                   {COPY.sellers.fields.yearsInOperation}
                 </span>
-                <p className="text-xs font-semibold text-zinc-300 bg-zinc-900/40 border border-zinc-900 px-3.5 py-2.5 rounded-xl">
+                <p className="text-xs font-semibold text-foreground bg-muted/20 border border-border px-3.5 py-2.5 rounded-xl">
                   {seller.yearsInOperation} years
                 </p>
               </div>
@@ -341,19 +341,19 @@ export default function SellerProfile() {
           </div>
 
           {/* Card 2: AI Match-Ready Summaries */}
-          <div className="bg-zinc-900/30 border border-zinc-900 rounded-2xl p-6 space-y-4">
-            <h2 className="text-sm font-bold text-zinc-300 uppercase tracking-wider flex items-center gap-2.5">
+          <div className="bg-card border border-border rounded-2xl p-6 space-y-4 shadow-sm">
+            <h2 className="text-sm font-bold text-foreground uppercase tracking-wider flex items-center gap-2.5">
               <Sparkles className="h-4.5 w-4.5 text-amber-500" />
               <span>AI Match-Ready Mandate Summary</span>
             </h2>
-            <p className="text-xs leading-relaxed text-zinc-400 whitespace-pre-line bg-zinc-950/40 border border-zinc-900/50 p-4 rounded-xl">
+            <p className="text-xs leading-relaxed text-foreground whitespace-pre-line bg-muted/20 border border-border p-4 rounded-xl">
               {seller.reasonForSale}
             </p>
-            <div className="p-4 bg-amber-500/5 border border-amber-500/10 rounded-xl space-y-2">
-              <span className="text-[10px] font-bold text-amber-400 uppercase tracking-wider block">
+            <div className="p-4 bg-amber-500/5 border border-amber-500/20 rounded-xl space-y-2">
+              <span className="text-[10px] font-bold text-amber-500 uppercase tracking-wider block">
                 AI Matching Guardrail
               </span>
-              <p className="text-[10px] leading-relaxed text-zinc-400">
+              <p className="text-[10px] leading-relaxed text-muted-foreground">
                 This summary represents the only free text that will be exposed during AI matching calculations. Ensure it is entirely de-identified. Individual identities (owner name, actual location, specific notes) are locked inside the portal database and omitted from prompts.
               </p>
             </div>
@@ -364,18 +364,18 @@ export default function SellerProfile() {
         <div className="space-y-8">
           
           {/* Card 3: Document Readiness Gauge */}
-          <div className="bg-zinc-900/30 border border-zinc-900 rounded-2xl p-6 space-y-6">
-            <div className="flex items-center justify-between border-b border-zinc-900 pb-3">
-              <h3 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
+          <div className="bg-card border border-border rounded-2xl p-6 space-y-6 shadow-sm">
+            <div className="flex items-center justify-between border-b border-border pb-3">
+              <h3 className="text-sm font-bold text-foreground uppercase tracking-wider flex items-center gap-2">
                 <ShieldCheck className="h-4 w-4 text-emerald-500" />
                 <span>Readiness Tracker</span>
               </h3>
               <span className={`text-[10px] font-bold px-2 py-0.5 rounded border uppercase tracking-wider ${
                 readinessScore >= 80 
-                  ? "bg-emerald-500/5 text-emerald-400 border-emerald-500/10" 
+                  ? "bg-emerald-500/5 text-emerald-500 border-emerald-500/20" 
                   : readinessScore >= 50 
-                    ? "bg-amber-500/5 text-amber-400 border-amber-500/10" 
-                    : "bg-rose-500/5 text-rose-400 border-rose-500/10"
+                    ? "bg-amber-500/5 text-amber-500 border-amber-500/20" 
+                    : "bg-rose-500/5 text-rose-500 border-rose-500/20"
               }`}>
                 {readinessScore >= 80 ? "Live Ready" : readinessScore >= 50 ? "Progressing" : "Unprepared"}
               </span>
@@ -384,14 +384,14 @@ export default function SellerProfile() {
             {/* Circular Gauge / Linear progress representation */}
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-[11px] font-bold text-zinc-400">
+                <span className="text-[11px] font-bold text-muted-foreground">
                   {COPY.sellers.readinessChecklist.scoreLabel}
                 </span>
-                <span className="text-sm font-extrabold text-white">
+                <span className="text-sm font-extrabold text-foreground">
                   {readinessScore}%
                 </span>
               </div>
-              <div className="w-full bg-zinc-950 h-2.5 rounded-full overflow-hidden border border-zinc-900 p-0.5">
+              <div className="w-full bg-muted h-2.5 rounded-full overflow-hidden border border-border p-0.5">
                 <div 
                   className={`h-full rounded-full transition-all duration-500 ${
                     readinessScore >= 80 
@@ -406,9 +406,9 @@ export default function SellerProfile() {
             </div>
 
             {/* Itemized List Checkboxes */}
-            <div className="space-y-3 pt-4 border-t border-zinc-900">
-              <div className="flex items-center justify-between text-xs text-zinc-300">
-                <span className="font-semibold text-zinc-400 uppercase tracking-wider text-[10px]">Mandate Document List</span>
+            <div className="space-y-3 pt-4 border-t border-border">
+              <div className="flex items-center justify-between text-xs text-foreground">
+                <span className="font-semibold text-muted-foreground uppercase tracking-wider text-[10px]">Mandate Document List</span>
                 <span>{readinessScore / 20}/5 Checked</span>
               </div>
               
@@ -424,8 +424,8 @@ export default function SellerProfile() {
                     key={idx} 
                     className={`flex items-center justify-between px-3 py-2 rounded-xl border text-[11px] font-semibold transition-all duration-300 ${
                       item.checked 
-                        ? "bg-emerald-500/5 border-emerald-500/10 text-emerald-400" 
-                        : "bg-zinc-900/30 border-zinc-900 text-zinc-500"
+                        ? "bg-emerald-500/5 border-emerald-500/20 text-emerald-600 dark:text-emerald-400" 
+                        : "bg-muted/10 border-border text-muted-foreground"
                     }`}
                   >
                     <span>{item.label}</span>
@@ -437,25 +437,25 @@ export default function SellerProfile() {
           </div>
 
           {/* Card 4: Confidential Internal Advisor Notes */}
-          <div className="bg-zinc-900/30 border border-zinc-900 rounded-2xl p-6 flex flex-col justify-between space-y-6">
+          <div className="bg-card border border-border rounded-2xl p-6 flex flex-col justify-between space-y-6 shadow-sm">
             <div className="space-y-4">
-              <div className="flex items-center justify-between border-b border-zinc-900 pb-3">
-                <h3 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
+              <div className="flex items-center justify-between border-b border-border pb-3">
+                <h3 className="text-sm font-bold text-foreground uppercase tracking-wider flex items-center gap-2">
                   <Lock className="h-4 w-4 text-amber-500" />
                   <span>Confidential Remarks</span>
                 </h3>
-                <span className="text-[9px] font-bold text-zinc-500 uppercase tracking-widest bg-zinc-950 px-2 py-0.5 rounded border border-zinc-900">
+                <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest bg-muted px-2 py-0.5 rounded border border-border">
                   Advisor Only
                 </span>
               </div>
               
               {seller.notes ? (
-                <p className="text-xs leading-relaxed text-zinc-400 whitespace-pre-line bg-zinc-950/40 border border-zinc-900/50 p-4 rounded-xl">
+                <p className="text-xs leading-relaxed text-foreground whitespace-pre-line bg-muted/20 border border-border p-4 rounded-xl">
                   {seller.notes}
                 </p>
               ) : (
-                <div className="p-8 text-center bg-zinc-950/20 border border-zinc-900/50 border-dashed rounded-xl">
-                  <p className="text-xs text-zinc-500">No advisor notes recorded for this seller mandate yet.</p>
+                <div className="p-8 text-center bg-muted/20 border border-border border-dashed rounded-xl">
+                  <p className="text-xs text-muted-foreground">No advisor notes recorded for this seller mandate yet.</p>
                 </div>
               )}
             </div>

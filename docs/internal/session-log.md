@@ -28,6 +28,26 @@
 
 ---
 
+## Session 14 — 2026-07-07
+**Agent:** Antigravity
+**Step:** Step 7 — Polish (Auth Middleware & Page Styling Refactor)
+**Status:** ✅ Complete
+
+### What Was Done
+- **Resolved Clerk Middleware Error**: Configured Next.js 16 `proxy.ts` with Clerk's `clerkMiddleware` to protect API matching routes (`/api/match`) and administrative pages while preserving the landing page's public accessibility.
+- **Tailwind v4 Custom Variant Strategy**: Configured the `@custom-variant dark` variant strategy in `app/globals.css` to enable class-based dark mode toggling following Tailwind v4 standards.
+- **Refactored Detail Views Styling**: Updated the detail pages for sellers (`app/(admin)/sellers/[id]/page.tsx`), buyers (`app/(admin)/buyers/[id]/page.tsx`), and matches (`app/(admin)/matches/[id]/page.tsx`) to use responsive semantic tokens (`bg-card`, `border-border`, `text-foreground`, `text-muted-foreground`, etc.) instead of hardcoded dark classes, making them fully compatible with both light and dark modes.
+- **Successful Production Build**: Verified compile-time safety and successfully built the project locally with `npm run build` using the new `proxy.ts` convention without warnings.
+
+### Decisions Made
+- Migrated standard Next.js middleware to the Next.js 16 `proxy.ts` file convention to satisfy runtime deprecation rules.
+- Maintained both `default` and named `proxy` exports in `proxy.ts` for maximum framework compatibility.
+
+### Next Steps
+- Verify Clerk integration in Vercel preview environments.
+
+---
+
 ## Session 13 — 2026-06-28
 **Agent:** Antigravity
 **Step:** Step 7 — Polish (Onboarding & Role Alignment)

@@ -167,27 +167,27 @@ export default function MatchDetail() {
       <div className="flex flex-col space-y-4">
         <Link
           href="/matches"
-          className="inline-flex items-center gap-1.5 text-xs text-zinc-400 hover:text-zinc-200 transition-colors w-fit"
+          className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors w-fit"
           id="match-back-nav"
         >
           <ArrowLeft className="h-3.5 w-3.5" />
           <span>Back to matches dashboard</span>
         </Link>
 
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 bg-zinc-900/20 border border-zinc-900 p-6 rounded-2xl">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 bg-card border border-border p-6 rounded-2xl shadow-sm">
           <div className="flex items-center gap-4">
-            <div className="p-3 bg-zinc-900 border border-zinc-800 rounded-2xl hidden sm:block shrink-0">
-              <Sparkles className="h-6 w-6 text-amber-400 fill-amber-500/10" />
+            <div className="p-3 bg-muted border border-border rounded-2xl hidden sm:block shrink-0">
+              <Sparkles className="h-6 w-6 text-amber-500 fill-amber-500/10" />
             </div>
             <div className="space-y-1">
-              <h1 className="text-xl font-bold tracking-tight text-white sm:text-2xl flex items-center gap-2">
+              <h1 className="text-xl font-bold tracking-tight text-foreground sm:text-2xl flex items-center gap-2">
                 <span>Advisor Match Review</span>
-                <span className="text-[10px] uppercase font-mono px-2 py-0.5 bg-zinc-950 border border-zinc-800 text-zinc-400 rounded-md">
+                <span className="text-[10px] uppercase font-mono px-2 py-0.5 bg-muted border border-border text-muted-foreground rounded-md">
                   Ref: {String(match._id).slice(-6)}
                 </span>
               </h1>
-              <p className="text-xs text-zinc-400">
-                Detailed matching evaluation for sell-side mandate <span className="font-semibold text-zinc-300">{match.sellerBusinessName}</span>
+              <p className="text-xs text-muted-foreground">
+                Detailed matching evaluation for sell-side mandate <span className="font-semibold text-foreground">{match.sellerBusinessName}</span>
               </p>
             </div>
           </div>
@@ -199,7 +199,7 @@ export default function MatchDetail() {
               className={`px-4 py-2 rounded-xl text-xs font-bold transition-all duration-300 border flex items-center gap-1.5 cursor-pointer disabled:cursor-not-allowed ${
                 match.status === "rejected"
                   ? "bg-rose-500/5 text-rose-500 border-rose-500/20"
-                  : "bg-zinc-950 hover:bg-rose-950/20 text-rose-400 hover:text-rose-300 border-rose-950/30 hover:border-rose-900/50"
+                  : "bg-card hover:bg-rose-500/5 text-rose-600 hover:text-rose-500 border border-border hover:border-rose-500/20"
               }`}
             >
               <XCircle className="h-3.5 w-3.5" />
@@ -212,7 +212,7 @@ export default function MatchDetail() {
               className={`px-4 py-2 rounded-xl text-xs font-bold transition-all duration-300 border flex items-center gap-1.5 cursor-pointer disabled:cursor-not-allowed ${
                 match.status === "closed_lost"
                   ? "bg-rose-950/30 text-rose-500 border-rose-900/20"
-                  : "bg-zinc-950 hover:bg-zinc-900 text-zinc-400 hover:text-zinc-200 border-zinc-900"
+                  : "bg-card hover:bg-muted text-muted-foreground hover:text-foreground border border-border"
               }`}
             >
               <span>Closed — Lost</span>
@@ -243,10 +243,10 @@ export default function MatchDetail() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
         {/* RADIAL SCORE CARD */}
-        <div className="bg-zinc-900/30 border border-zinc-900 rounded-2xl p-6 flex flex-col items-center justify-center text-center space-y-6 relative overflow-hidden group">
+        <div className="bg-card border border-border rounded-2xl p-6 flex flex-col items-center justify-center text-center space-y-6 relative overflow-hidden group shadow-sm">
           <div className="absolute inset-0 bg-gradient-to-b from-amber-500/5 to-transparent opacity-40 pointer-events-none" />
           
-          <h2 className="text-xs font-bold text-zinc-400 uppercase tracking-widest flex items-center gap-1.5">
+          <h2 className="text-xs font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-1.5">
             <Award className="h-4 w-4 text-amber-400" />
             <span>Fit Match score</span>
           </h2>
@@ -258,7 +258,7 @@ export default function MatchDetail() {
                 cx="64"
                 cy="64"
                 r={radialRadius}
-                className="stroke-zinc-800 fill-transparent"
+                className="stroke-muted fill-transparent"
                 strokeWidth="8"
               />
               <circle
@@ -279,53 +279,53 @@ export default function MatchDetail() {
               />
             </svg>
             <div className="flex flex-col items-center justify-center">
-              <span className="text-3xl font-extrabold text-white">{match.aiScore}</span>
-              <span className="text-[10px] text-zinc-500 uppercase tracking-wider font-semibold">Match Strength</span>
+              <span className="text-3xl font-extrabold text-foreground">{match.aiScore}</span>
+              <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">Match Strength</span>
             </div>
           </div>
 
           <div className="space-y-1">
             <span className={`inline-flex px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider border ${
               match.aiScore >= 80
-                ? "bg-emerald-500/5 border-emerald-500/20 text-emerald-400"
+                ? "bg-emerald-500/5 border-emerald-500/20 text-emerald-600 dark:text-emerald-400"
                 : match.aiScore >= 50
-                  ? "bg-amber-500/5 border-amber-500/20 text-amber-400"
-                  : "bg-rose-500/5 border-rose-500/20 text-rose-400"
+                  ? "bg-amber-500/5 border-amber-500/20 text-amber-600 dark:text-amber-400"
+                  : "bg-rose-500/5 border-rose-500/20 text-rose-600 dark:text-rose-400"
             }`}>
               {match.aiScore >= 80 ? "Premium Strong Fit" : match.aiScore >= 50 ? "Qualified Standard Fit" : "Speculative Fit"}
             </span>
-            <p className="text-[10px] text-zinc-500 leading-relaxed max-w-[200px] pt-1">
+            <p className="text-[10px] text-muted-foreground leading-relaxed max-w-[200px] pt-1">
               Calculated dynamically on de-identified acquisition criteria and mandating constraints.
             </p>
           </div>
         </div>
 
         {/* AI REASONING CARD */}
-        <div className="lg:col-span-2 bg-zinc-900/30 border border-zinc-900 rounded-2xl p-6 flex flex-col justify-between space-y-6">
+        <div className="lg:col-span-2 bg-card border border-border rounded-2xl p-6 flex flex-col justify-between space-y-6 shadow-sm">
           <div className="space-y-4">
-            <h2 className="text-xs font-bold text-zinc-400 uppercase tracking-widest flex items-center gap-2">
+            <h2 className="text-xs font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-2">
               <Sparkles className="h-4.5 w-4.5 text-amber-500" />
               <span>{COPY.matches.details.fitReasoning}</span>
             </h2>
-            <div className="p-4.5 bg-zinc-950/40 border border-zinc-900/50 rounded-xl relative group">
+            <div className="p-4.5 bg-muted/20 border border-border rounded-xl relative group">
               <div className="absolute top-2 right-2 p-1 bg-amber-500/5 border border-amber-500/10 rounded-md opacity-40 group-hover:opacity-100 transition-opacity">
                 <Sparkles className="h-3 w-3 text-amber-400" />
               </div>
-              <p className="text-xs text-zinc-300 leading-relaxed whitespace-pre-line italic">
+              <p className="text-xs text-foreground leading-relaxed whitespace-pre-line italic">
                 &ldquo;{match.aiReasoning}&rdquo;
               </p>
             </div>
           </div>
 
           <div className="space-y-3">
-            <h3 className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">
+            <h3 className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
               {COPY.matches.details.matchedCriteria}
             </h3>
             <div className="flex flex-wrap gap-2">
               {match.aiMatchedCriteria.map((criterion: string, idx: number) => (
                 <span
                   key={idx}
-                  className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-500/5 hover:bg-amber-500/10 border border-amber-500/10 hover:border-amber-500/20 text-amber-400 text-[10px] font-bold uppercase tracking-wider rounded-lg transition-all duration-300"
+                  className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-500/5 hover:bg-amber-500/10 border border-amber-500/15 hover:border-amber-500/30 text-amber-600 dark:text-amber-400 text-[10px] font-bold uppercase tracking-wider rounded-lg transition-all duration-300"
                 >
                   <CheckCircle className="h-3 w-3 stroke-[2.5]" />
                   <span>{criterion}</span>
@@ -337,14 +337,14 @@ export default function MatchDetail() {
       </div>
 
       {/* DEAL PIPELINE TRACKER */}
-      <div className="bg-zinc-900/30 border border-zinc-900 rounded-2xl p-6 space-y-6">
-        <div className="flex items-center justify-between border-b border-zinc-900 pb-3">
-          <h2 className="text-xs font-bold text-zinc-400 uppercase tracking-widest flex items-center gap-2">
+      <div className="bg-card border border-border rounded-2xl p-6 space-y-6 shadow-sm">
+        <div className="flex items-center justify-between border-b border-border pb-3">
+          <h2 className="text-xs font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-2">
             <Layers className="h-4.5 w-4.5 text-amber-500" />
             <span>Interactive Deal Pipeline Stage</span>
           </h2>
-          <span className="text-[10px] text-zinc-400 font-semibold">
-            Current: <span className="font-bold text-white capitalize">{match.status.replace("_", " ")}</span>
+          <span className="text-[10px] text-muted-foreground font-semibold">
+            Current: <span className="font-bold text-foreground capitalize">{match.status.replace("_", " ")}</span>
           </span>
         </div>
 
@@ -361,10 +361,10 @@ export default function MatchDetail() {
                 onClick={() => handleStageTransition(stage.value)}
                 className={`p-3 rounded-xl border flex flex-col items-center justify-center text-center transition-all duration-300 cursor-pointer disabled:cursor-not-allowed group relative overflow-hidden ${
                   isActive
-                    ? "bg-zinc-900 border-amber-500/60 shadow-lg shadow-amber-500/5"
+                    ? "bg-card border-amber-500/60 shadow-lg shadow-amber-500/5"
                     : isCompleted
-                      ? "bg-zinc-900/40 border-zinc-800 text-zinc-300 hover:border-zinc-700"
-                      : "bg-zinc-950/20 border-zinc-900/40 text-zinc-500 hover:border-zinc-800"
+                      ? "bg-muted/30 border-border text-foreground hover:border-muted-foreground/30"
+                      : "bg-muted/10 border-border/40 text-muted-foreground hover:border-border"
                 }`}
               >
                 {/* Visual completion indicators */}
@@ -373,15 +373,15 @@ export default function MatchDetail() {
                     ? "bg-amber-400 animate-pulse scale-125" 
                     : isCompleted 
                       ? "bg-emerald-500" 
-                      : "bg-zinc-800 group-hover:bg-zinc-700"
+                      : "bg-muted-foreground/30 group-hover:bg-muted-foreground/60"
                 }`} />
 
                 <span className={`text-[10px] font-bold uppercase tracking-wider block transition-colors ${
                   isActive 
-                    ? "text-amber-400" 
+                    ? "text-amber-500 dark:text-amber-400" 
                     : isCompleted 
-                      ? "text-zinc-200" 
-                      : "text-zinc-500 group-hover:text-zinc-400"
+                      ? "text-foreground" 
+                      : "text-muted-foreground group-hover:text-foreground"
                 }`}>
                   {stage.label}
                 </span>
@@ -396,10 +396,10 @@ export default function MatchDetail() {
         </div>
 
         {/* Conditional stage status advice helpers */}
-        <div className="p-4 bg-zinc-950/40 border border-zinc-900 rounded-xl flex items-start gap-3">
-          <HelpCircle className="h-4.5 w-4.5 text-zinc-500 shrink-0 mt-0.5" />
-          <p className="text-[10px] leading-relaxed text-zinc-400">
-            Advisors can manually push the mandate pipeline forward as buy-sell discussions advance. Transitioning a match records an append-only log in the advisor activity tracking database. Closed deals should be archived using the <span className="font-semibold text-zinc-200">Closed — Won</span> or <span className="font-semibold text-zinc-200">Closed — Lost</span> triggers.
+        <div className="p-4 bg-muted/20 border border-border rounded-xl flex items-start gap-3">
+          <HelpCircle className="h-4.5 w-4.5 text-muted-foreground shrink-0 mt-0.5" />
+          <p className="text-[10px] leading-relaxed text-muted-foreground">
+            Advisors can manually push the mandate pipeline forward as buy-sell discussions advance. Transitioning a match records an append-only log in the advisor activity tracking database. Closed deals should be archived using the <span className="font-semibold text-foreground">Closed — Won</span> or <span className="font-semibold text-foreground">Closed — Lost</span> triggers.
           </p>
         </div>
       </div>
@@ -408,13 +408,13 @@ export default function MatchDetail() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         
         {/* SELLER FIT PROFILE */}
-        <div className="bg-zinc-900/30 border border-zinc-900 rounded-2xl p-6 space-y-6">
-          <div className="flex items-center justify-between border-b border-zinc-900 pb-3">
-            <h2 className="text-xs font-bold text-zinc-400 uppercase tracking-widest flex items-center gap-2">
+        <div className="bg-card border border-border rounded-2xl p-6 space-y-6 shadow-sm">
+          <div className="flex items-center justify-between border-b border-border pb-3">
+            <h2 className="text-xs font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-2">
               <Building className="h-4.5 w-4.5 text-amber-500" />
               <span>Seller profile summary</span>
             </h2>
-            <span className="text-[9px] font-bold uppercase tracking-wider text-emerald-400 bg-emerald-500/5 px-2 py-0.5 rounded border border-emerald-500/10">
+            <span className="text-[9px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 bg-emerald-500/5 px-2 py-0.5 rounded border border-emerald-500/20">
               Readiness: {match.sellerReadinessScore}%
             </span>
           </div>
@@ -423,70 +423,70 @@ export default function MatchDetail() {
             
             {/* Financial Parameters */}
             <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1.5 p-3.5 bg-zinc-950/40 border border-zinc-900 rounded-xl">
-                <span className="text-[9px] font-bold text-zinc-500 uppercase tracking-wider">Revenue range</span>
-                <p className="text-xs font-semibold text-zinc-200">{sellerRevenueLabel}</p>
+              <div className="space-y-1.5 p-3.5 bg-muted/20 border border-border rounded-xl">
+                <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider">Revenue range</span>
+                <p className="text-xs font-semibold text-foreground">{sellerRevenueLabel}</p>
               </div>
-              <div className="space-y-1.5 p-3.5 bg-zinc-950/40 border border-zinc-900 rounded-xl">
-                <span className="text-[9px] font-bold text-zinc-500 uppercase tracking-wider">EBITDA range</span>
-                <p className="text-xs font-semibold text-zinc-200">{sellerEbitdaLabel}</p>
+              <div className="space-y-1.5 p-3.5 bg-muted/20 border border-border rounded-xl">
+                <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider">EBITDA range</span>
+                <p className="text-xs font-semibold text-foreground">{sellerEbitdaLabel}</p>
               </div>
             </div>
 
             {/* Criteria List */}
-            <div className="divide-y divide-zinc-900/40 text-xs">
+            <div className="divide-y divide-border text-xs">
               <div className="py-3 flex justify-between gap-4">
-                <span className="text-zinc-500">Business sector</span>
-                <span className="font-semibold text-zinc-200">{sellerSectorLabel}</span>
+                <span className="text-muted-foreground">Business sector</span>
+                <span className="font-semibold text-foreground">{sellerSectorLabel}</span>
               </div>
               <div className="py-3 flex justify-between gap-4">
-                <span className="text-zinc-500">Business geography</span>
-                <span className="font-semibold text-zinc-200">{sellerGeographyLabel}</span>
+                <span className="text-muted-foreground">Business geography</span>
+                <span className="font-semibold text-foreground">{sellerGeographyLabel}</span>
               </div>
               <div className="py-3 flex justify-between gap-4">
-                <span className="text-zinc-500">Structure structure</span>
-                <span className="font-semibold text-zinc-200">{sellerTransactionLabel}</span>
+                <span className="text-muted-foreground">Structure structure</span>
+                <span className="font-semibold text-foreground">{sellerTransactionLabel}</span>
               </div>
               <div className="py-3 flex justify-between gap-4">
-                <span className="text-zinc-500">Employee strength</span>
-                <span className="font-semibold text-zinc-200">{sellerEmployeeLabel}</span>
+                <span className="text-muted-foreground">Employee strength</span>
+                <span className="font-semibold text-foreground">{sellerEmployeeLabel}</span>
               </div>
               <div className="py-3 flex justify-between gap-4">
-                <span className="text-zinc-500">Operating timeline</span>
-                <span className="font-semibold text-zinc-200">{match.sellerYearsInOperation} Years</span>
+                <span className="text-muted-foreground">Operating timeline</span>
+                <span className="font-semibold text-foreground">{match.sellerYearsInOperation} Years</span>
               </div>
             </div>
 
             {/* AI Summary block */}
             <div className="space-y-2 pt-2">
-              <span className="text-[9px] font-bold text-zinc-500 uppercase tracking-wider flex items-center gap-1">
+              <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider flex items-center gap-1">
                 <BookOpen className="h-3 w-3" />
                 <span>Advisor summarized reason for sale</span>
               </span>
-              <p className="text-xs leading-relaxed text-zinc-400 p-3 bg-zinc-950/20 border border-zinc-900/40 rounded-xl">
+              <p className="text-xs leading-relaxed text-foreground p-3 bg-muted/10 border border-border/80 rounded-xl">
                 {match.sellerReasonForSale}
               </p>
             </div>
             
             {/* Identity details (PII) */}
-            <div className="space-y-2 pt-2 border-t border-zinc-900">
-              <span className="text-[9px] font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1">
+            <div className="space-y-2 pt-2 border-t border-border">
+              <span className="text-[9px] font-bold text-amber-500 uppercase tracking-wider flex items-center gap-1">
                 <Lock className="h-3 w-3 text-amber-500" />
                 <span>Authorized advisor contact records</span>
               </span>
-              <div className="p-3.5 bg-zinc-950/40 border border-zinc-900 rounded-xl text-xs space-y-1.5">
+              <div className="p-3.5 bg-muted/20 border border-border rounded-xl text-xs space-y-1.5">
                 <div className="flex justify-between">
-                  <span className="text-zinc-500">Owner name:</span>
-                  <span className="font-semibold text-zinc-300">{match.sellerName}</span>
+                  <span className="text-muted-foreground">Owner name:</span>
+                  <span className="font-semibold text-foreground">{match.sellerName}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-zinc-500">Direct email:</span>
-                  <a href={`mailto:${match.sellerEmail}`} className="font-semibold text-zinc-300 hover:text-white transition-colors">{match.sellerEmail}</a>
+                  <span className="text-muted-foreground">Direct email:</span>
+                  <a href={`mailto:${match.sellerEmail}`} className="font-semibold text-foreground hover:text-primary transition-colors">{match.sellerEmail}</a>
                 </div>
                 {match.sellerPhone && (
                   <div className="flex justify-between">
-                    <span className="text-zinc-500">Direct phone:</span>
-                    <span className="font-semibold text-zinc-300">{match.sellerPhone}</span>
+                    <span className="text-muted-foreground">Direct phone:</span>
+                    <span className="font-semibold text-foreground">{match.sellerPhone}</span>
                   </div>
                 )}
               </div>
@@ -496,13 +496,13 @@ export default function MatchDetail() {
         </div>
 
         {/* BUYER PROFILE */}
-        <div className="bg-zinc-900/30 border border-zinc-900 rounded-2xl p-6 space-y-6">
-          <div className="flex items-center justify-between border-b border-zinc-900 pb-3">
-            <h2 className="text-xs font-bold text-zinc-400 uppercase tracking-widest flex items-center gap-2">
+        <div className="bg-card border border-border rounded-2xl p-6 space-y-6 shadow-sm">
+          <div className="flex items-center justify-between border-b border-border pb-3">
+            <h2 className="text-xs font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-2">
               <Briefcase className="h-4.5 w-4.5 text-amber-500" />
               <span>Buyer profile summary</span>
             </h2>
-            <span className="text-[9px] font-bold uppercase tracking-wider text-amber-400 bg-amber-500/5 px-2 py-0.5 rounded border border-amber-500/10">
+            <span className="text-[9px] font-bold uppercase tracking-wider text-amber-500 bg-amber-500/5 px-2 py-0.5 rounded border border-amber-500/20">
               Acquirer criteria
             </span>
           </div>
@@ -511,29 +511,29 @@ export default function MatchDetail() {
             
             {/* Financial Parameters */}
             <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1.5 p-3.5 bg-zinc-950/40 border border-zinc-900 rounded-xl">
-                <span className="text-[9px] font-bold text-zinc-500 uppercase tracking-wider">Minimum budget</span>
-                <p className="text-xs font-semibold text-zinc-200">
+              <div className="space-y-1.5 p-3.5 bg-muted/20 border border-border rounded-xl">
+                <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider">Minimum budget</span>
+                <p className="text-xs font-semibold text-foreground">
                   ${(match.buyerBudgetMin / 1000000).toFixed(1)}M CAD
                 </p>
               </div>
-              <div className="space-y-1.5 p-3.5 bg-zinc-950/40 border border-zinc-900 rounded-xl">
-                <span className="text-[9px] font-bold text-zinc-500 uppercase tracking-wider">Maximum budget</span>
-                <p className="text-xs font-semibold text-zinc-200">
+              <div className="space-y-1.5 p-3.5 bg-muted/20 border border-border rounded-xl">
+                <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider">Maximum budget</span>
+                <p className="text-xs font-semibold text-foreground">
                   ${(match.buyerBudgetMax / 1000000).toFixed(1)}M CAD
                 </p>
               </div>
             </div>
 
             {/* Criteria List */}
-            <div className="divide-y divide-zinc-900/40 text-xs">
+            <div className="divide-y divide-border text-xs">
               <div className="py-3 flex flex-col gap-1.5">
-                <span className="text-zinc-500">Sectors of interest</span>
+                <span className="text-muted-foreground">Sectors of interest</span>
                 <div className="flex flex-wrap gap-1">
                   {match.buyerSectorInterest.map((s: string, idx: number) => (
                     <span
                       key={idx}
-                      className="px-2 py-0.5 bg-zinc-900 border border-zinc-800 text-[10px] text-zinc-300 font-semibold rounded-lg capitalize"
+                      className="px-2 py-0.5 bg-muted border border-border text-[10px] text-foreground font-semibold rounded-lg capitalize"
                     >
                       {s.replace("_", " ")}
                     </span>
@@ -541,12 +541,12 @@ export default function MatchDetail() {
                 </div>
               </div>
               <div className="py-3 flex flex-col gap-1.5">
-                <span className="text-zinc-500">Preferred geographies</span>
+                <span className="text-muted-foreground">Preferred geographies</span>
                 <div className="flex flex-wrap gap-1">
                   {match.buyerGeography.map((g: string, idx: number) => (
                     <span
                       key={idx}
-                      className="px-2 py-0.5 bg-zinc-900 border border-zinc-800 text-[10px] text-zinc-300 font-semibold rounded-lg capitalize"
+                      className="px-2 py-0.5 bg-muted border border-border text-[10px] text-foreground font-semibold rounded-lg capitalize"
                     >
                       {g.replace("_", " ")}
                     </span>
@@ -554,16 +554,16 @@ export default function MatchDetail() {
                 </div>
               </div>
               <div className="py-3 flex justify-between gap-4">
-                <span className="text-zinc-500">Financing preference</span>
-                <span className="font-semibold text-zinc-200">{buyerFinancingLabel}</span>
+                <span className="text-muted-foreground">Financing preference</span>
+                <span className="font-semibold text-foreground">{buyerFinancingLabel}</span>
               </div>
               <div className="py-3 flex justify-between gap-4">
-                <span className="text-zinc-500">M&A experience level</span>
-                <span className="font-semibold text-zinc-200">{buyerExperienceLabel}</span>
+                <span className="text-muted-foreground">M&A experience level</span>
+                <span className="font-semibold text-foreground">{buyerExperienceLabel}</span>
               </div>
               <div className="py-3 flex justify-between gap-4">
-                <span className="text-zinc-500">Desired deal timeline</span>
-                <span className="font-semibold text-zinc-200">{buyerTimelineLabel}</span>
+                <span className="text-muted-foreground">Desired deal timeline</span>
+                <span className="font-semibold text-foreground">{buyerTimelineLabel}</span>
               </div>
             </div>
 
@@ -571,46 +571,46 @@ export default function MatchDetail() {
             <div className="grid grid-cols-3 gap-2 text-center pt-2">
               <div className={`p-2 rounded-xl border text-[9px] font-bold uppercase tracking-wider ${
                 match.buyerNdaSigned
-                  ? "bg-emerald-500/5 border-emerald-500/10 text-emerald-400"
-                  : "bg-zinc-950/40 border-zinc-900 text-zinc-600"
+                  ? "bg-emerald-500/5 border-emerald-500/20 text-emerald-600 dark:text-emerald-400"
+                  : "bg-muted/10 border-border text-muted-foreground"
               }`}>
                 NDA Signed
               </div>
               <div className={`p-2 rounded-xl border text-[9px] font-bold uppercase tracking-wider ${
                 match.buyerProofOfFundsReviewed
-                  ? "bg-emerald-500/5 border-emerald-500/10 text-emerald-400"
-                  : "bg-zinc-950/40 border-zinc-900 text-zinc-600"
+                  ? "bg-emerald-500/5 border-emerald-500/20 text-emerald-600 dark:text-emerald-400"
+                  : "bg-muted/10 border-border text-muted-foreground"
               }`}>
                 Funds Verified
               </div>
               <div className={`p-2 rounded-xl border text-[9px] font-bold uppercase tracking-wider ${
                 match.buyerBackgroundCheckComplete
-                  ? "bg-emerald-500/5 border-emerald-500/10 text-emerald-400"
-                  : "bg-zinc-950/40 border-zinc-900 text-zinc-600"
+                  ? "bg-emerald-500/5 border-emerald-500/20 text-emerald-600 dark:text-emerald-400"
+                  : "bg-muted/10 border-border text-muted-foreground"
               }`}>
                 BG Check
               </div>
             </div>
 
             {/* Identity details (PII) */}
-            <div className="space-y-2 pt-2 border-t border-zinc-900">
-              <span className="text-[9px] font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1">
+            <div className="space-y-2 pt-2 border-t border-border">
+              <span className="text-[9px] font-bold text-amber-500 uppercase tracking-wider flex items-center gap-1">
                 <Lock className="h-3 w-3 text-amber-500" />
                 <span>Authorized advisor contact records</span>
               </span>
-              <div className="p-3.5 bg-zinc-950/40 border border-zinc-900 rounded-xl text-xs space-y-1.5">
+              <div className="p-3.5 bg-muted/20 border border-border rounded-xl text-xs space-y-1.5">
                 <div className="flex justify-between">
-                  <span className="text-zinc-500">Buyer name:</span>
-                  <span className="font-semibold text-zinc-300">{match.buyerName}</span>
+                  <span className="text-muted-foreground">Buyer name:</span>
+                  <span className="font-semibold text-foreground">{match.buyerName}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-zinc-500">Direct email:</span>
-                  <a href={`mailto:${match.buyerEmail}`} className="font-semibold text-zinc-300 hover:text-white transition-colors">{match.buyerEmail}</a>
+                  <span className="text-muted-foreground">Direct email:</span>
+                  <a href={`mailto:${match.buyerEmail}`} className="font-semibold text-foreground hover:text-primary transition-colors">{match.buyerEmail}</a>
                 </div>
                 {match.buyerPhone && (
                   <div className="flex justify-between">
-                    <span className="text-zinc-500">Direct phone:</span>
-                    <span className="font-semibold text-zinc-300">{match.buyerPhone}</span>
+                    <span className="text-muted-foreground">Direct phone:</span>
+                    <span className="font-semibold text-foreground">{match.buyerPhone}</span>
                   </div>
                 )}
               </div>
@@ -621,13 +621,13 @@ export default function MatchDetail() {
       </div>
 
       {/* INTERNAL ADVISOR NOTES / REMARKS */}
-      <div className="bg-zinc-900/30 border border-zinc-900 rounded-2xl p-6 space-y-4">
-        <div className="flex items-center justify-between border-b border-zinc-900 pb-3">
-          <h2 className="text-xs font-bold text-zinc-400 uppercase tracking-widest flex items-center gap-2">
+      <div className="bg-card border border-border rounded-2xl p-6 space-y-4 shadow-sm">
+        <div className="flex items-center justify-between border-b border-border pb-3">
+          <h2 className="text-xs font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-2">
             <Bookmark className="h-4.5 w-4.5 text-amber-500" />
             <span>Confidential Internal Advisor Remarks</span>
           </h2>
-          <span className="text-[9px] font-bold text-zinc-500 uppercase tracking-widest bg-zinc-950 px-2 py-0.5 rounded border border-zinc-900">
+          <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest bg-muted px-2 py-0.5 rounded border border-border">
             Advisor Eyes Only
           </span>
         </div>
@@ -638,18 +638,18 @@ export default function MatchDetail() {
             onChange={(e) => setAdvisorNotes(e.target.value)}
             placeholder="Record transaction negotiation remarks, buyer responses, NDA updates, and upcoming calendar meetings specific to this deal matchup..."
             rows={5}
-            className="w-full p-4 bg-zinc-950/40 focus:bg-zinc-950/70 border border-zinc-900 focus:border-zinc-800 rounded-xl text-xs text-white placeholder-zinc-600 outline-none transition-all duration-300 resize-none"
+            className="w-full p-4 bg-muted/20 focus:bg-muted/40 border border-border focus:border-muted-foreground/30 rounded-xl text-xs text-foreground placeholder-muted-foreground/50 outline-none transition-all duration-300 resize-none"
           />
           
           <div className="flex items-center justify-between gap-4">
-            <p className="text-[10px] text-zinc-500 leading-relaxed max-w-xl">
+            <p className="text-[10px] text-muted-foreground leading-relaxed max-w-xl">
               Confidential remarks written here are strictly protected on the data layer and will never be exposed during any background AI matching routines or exports.
             </p>
             
             <button
               onClick={handleSaveNotes}
               disabled={savingNotes}
-              className="px-5 py-2.5 bg-amber-500 hover:bg-amber-600 disabled:bg-zinc-800 disabled:text-zinc-500 text-zinc-950 rounded-xl text-xs font-extrabold transition-all duration-300 shadow-md shadow-amber-500/10 flex items-center gap-2 cursor-pointer disabled:cursor-not-allowed shrink-0"
+              className="px-5 py-2.5 bg-amber-500 hover:bg-amber-600 disabled:bg-muted disabled:text-muted-foreground text-zinc-950 rounded-xl text-xs font-extrabold transition-all duration-300 shadow-md shadow-amber-500/10 flex items-center gap-2 cursor-pointer disabled:cursor-not-allowed shrink-0"
             >
               {savingNotes ? (
                 <>

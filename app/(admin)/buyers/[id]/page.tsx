@@ -143,26 +143,26 @@ export default function BuyerProfile() {
           <span>Back to buyers list</span>
         </Link>
 
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 bg-zinc-900/20 border border-zinc-900 p-6 rounded-2xl">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 bg-card border border-border p-6 rounded-2xl shadow-sm">
           <div className="flex items-start gap-4">
-            <div className="p-3 bg-zinc-900 border border-zinc-800 rounded-2xl hidden sm:block shrink-0">
-              <Building className="h-6 w-6 text-zinc-400" />
+            <div className="p-3 bg-muted border border-border rounded-2xl hidden sm:block shrink-0">
+              <Building className="h-6 w-6 text-muted-foreground" />
             </div>
             <div className="space-y-2">
               <div className="flex flex-wrap items-center gap-3">
-                <h1 className="text-xl font-bold tracking-tight text-white sm:text-2xl">
+                <h1 className="text-xl font-bold tracking-tight text-foreground sm:text-2xl">
                   {buyer.name}
                 </h1>
                 <BuyerStatusBadge status={buyer.qualificationStatus} />
               </div>
-              <div className="flex flex-wrap gap-x-4 gap-y-1.5 text-xs text-zinc-400">
-                <a href={`mailto:${buyer.email}`} className="flex items-center gap-1.5 hover:text-zinc-200 transition-colors">
-                  <Mail className="h-3.5 w-3.5 text-zinc-500" />
+              <div className="flex flex-wrap gap-x-4 gap-y-1.5 text-xs text-muted-foreground">
+                <a href={`mailto:${buyer.email}`} className="flex items-center gap-1.5 hover:text-foreground transition-colors text-muted-foreground">
+                  <Mail className="h-3.5 w-3.5 text-muted-foreground" />
                   <span>{buyer.email}</span>
                 </a>
                 {buyer.phone && (
-                  <span className="flex items-center gap-1.5">
-                    <Phone className="h-3.5 w-3.5 text-zinc-500" />
+                  <span className="flex items-center gap-1.5 text-muted-foreground">
+                    <Phone className="h-3.5 w-3.5 text-muted-foreground" />
                     <span>{buyer.phone}</span>
                   </span>
                 )}
@@ -172,8 +172,8 @@ export default function BuyerProfile() {
 
           <div className="flex flex-wrap items-center gap-3 shrink-0">
             {/* Status Mutation Select */}
-            <div className="flex items-center bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-1.5 gap-2">
-              <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
+            <div className="flex items-center bg-card border border-border rounded-xl px-3 py-1.5 gap-2">
+              <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
                 Status
               </label>
               {updatingStatus ? (
@@ -182,20 +182,20 @@ export default function BuyerProfile() {
                 <select
                   value={buyer.qualificationStatus}
                   onChange={handleStatusChange}
-                  className="bg-transparent text-xs font-semibold text-white outline-none cursor-pointer"
+                  className="bg-transparent text-xs font-semibold text-foreground outline-none cursor-pointer"
                 >
-                  <option value="pending" className="bg-zinc-950 text-zinc-300">Pending Review</option>
-                  <option value="qualified" className="bg-zinc-950 text-emerald-400">Qualified</option>
-                  <option value="disqualified" className="bg-zinc-950 text-rose-400">Disqualified</option>
+                  <option value="pending" className="bg-popover text-muted-foreground">Pending Review</option>
+                  <option value="qualified" className="bg-popover text-emerald-500">Qualified</option>
+                  <option value="disqualified" className="bg-popover text-rose-500">Disqualified</option>
                 </select>
               )}
             </div>
 
             <button
               onClick={() => setIsEditing(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-zinc-900 hover:bg-zinc-800/80 border border-zinc-800 hover:border-zinc-700 rounded-xl text-xs font-semibold text-zinc-200 transition-all duration-300"
+              className="flex items-center gap-2 px-4 py-2 bg-card hover:bg-muted border border-border rounded-xl text-xs font-semibold text-foreground transition-all duration-300"
             >
-              <Edit className="h-4 w-4 text-zinc-400" />
+              <Edit className="h-4 w-4 text-muted-foreground" />
               <span>Edit Criteria</span>
             </button>
           </div>
@@ -209,33 +209,33 @@ export default function BuyerProfile() {
         <div className="lg:col-span-2 space-y-8">
           
           {/* Card 1: Investment Parameters */}
-          <div className="bg-zinc-900/30 border border-zinc-900 rounded-2xl p-6 space-y-6">
-            <h2 className="text-sm font-bold text-zinc-300 uppercase tracking-wider flex items-center gap-2.5">
+          <div className="bg-card border border-border rounded-2xl p-6 space-y-6 shadow-sm">
+            <h2 className="text-sm font-bold text-foreground uppercase tracking-wider flex items-center gap-2.5">
               <DollarSign className="h-4.5 w-4.5 text-amber-500" />
               <span>Acquisition Parameters</span>
             </h2>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              <div className="space-y-1.5 p-4 bg-zinc-950/40 border border-zinc-900/60 rounded-xl">
-                <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">
+              <div className="space-y-1.5 p-4 bg-muted/40 border border-border/80 rounded-xl">
+                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
                   Target Budget (CAD)
                 </span>
-                <p className="text-lg font-bold text-white">
+                <p className="text-lg font-bold text-foreground">
                   {formatCAD(buyer.budgetMin)} – {formatCAD(buyer.budgetMax)}
                 </p>
-                <div className="w-full bg-zinc-900 h-1.5 rounded-full overflow-hidden mt-2.5">
+                <div className="w-full bg-muted h-1.5 rounded-full overflow-hidden mt-2.5">
                   <div className="bg-gradient-to-r from-amber-500 to-yellow-400 h-full w-full rounded-full" />
                 </div>
               </div>
 
-              <div className="space-y-1.5 p-4 bg-zinc-950/40 border border-zinc-900/60 rounded-xl">
-                <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">
+              <div className="space-y-1.5 p-4 bg-muted/40 border border-border/80 rounded-xl">
+                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
                   {COPY.buyers.fields.financing}
                 </span>
-                <p className="text-sm font-bold text-zinc-200">
+                <p className="text-sm font-bold text-foreground">
                   {financingLabel}
                 </p>
-                <p className="text-[10px] text-zinc-500 font-medium leading-relaxed mt-1">
+                <p className="text-[10px] text-muted-foreground font-medium leading-relaxed mt-1">
                   Required capital verification checklists should map to financing terms.
                 </p>
               </div>
@@ -243,21 +243,21 @@ export default function BuyerProfile() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <div className="space-y-1.5">
-                <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider flex items-center gap-1.5">
-                  <Clock className="h-3.5 w-3.5" />
+                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
+                  <Clock className="h-3.5 w-3.5 text-muted-foreground" />
                   <span>{COPY.buyers.fields.timeline}</span>
                 </span>
-                <p className="text-xs font-semibold text-zinc-300 bg-zinc-900/40 border border-zinc-900 px-3.5 py-2.5 rounded-xl">
+                <p className="text-xs font-semibold text-foreground bg-muted/20 border border-border px-3.5 py-2.5 rounded-xl">
                   {timelineLabel}
                 </p>
               </div>
 
               <div className="space-y-1.5">
-                <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider flex items-center gap-1.5">
-                  <Briefcase className="h-3.5 w-3.5" />
+                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
+                  <Briefcase className="h-3.5 w-3.5 text-muted-foreground" />
                   <span>{COPY.buyers.fields.experience}</span>
                 </span>
-                <p className="text-xs font-semibold text-zinc-300 bg-zinc-900/40 border border-zinc-900 px-3.5 py-2.5 rounded-xl">
+                <p className="text-xs font-semibold text-foreground bg-muted/20 border border-border px-3.5 py-2.5 rounded-xl">
                   {experienceLabel}
                 </p>
               </div>
@@ -265,17 +265,17 @@ export default function BuyerProfile() {
           </div>
 
           {/* Card 2: Sector & Geographic Tags */}
-          <div className="bg-zinc-900/30 border border-zinc-900 rounded-2xl p-6 space-y-6">
+          <div className="bg-card border border-border rounded-2xl p-6 space-y-6 shadow-sm">
             <div className="space-y-4">
-              <h3 className="text-xs font-bold text-zinc-400 uppercase tracking-wider flex items-center gap-2">
-                <Building className="h-4 w-4 text-zinc-500" />
+              <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wider flex items-center gap-2">
+                <Building className="h-4 w-4 text-muted-foreground" />
                 <span>{COPY.buyers.fields.sectors}</span>
               </h3>
               <div className="flex flex-wrap gap-2">
                 {sectorsLabels.map((sector, idx) => (
                   <span
                     key={idx}
-                    className="px-3 py-1.5 bg-amber-500/5 border border-amber-500/10 hover:border-amber-500/20 text-amber-400 text-xs font-semibold rounded-xl transition-all duration-300 shadow-sm"
+                    className="px-3 py-1.5 bg-amber-500/5 border border-amber-500/20 text-amber-600 dark:text-amber-400 text-xs font-semibold rounded-xl transition-all duration-300 shadow-sm"
                   >
                     {sector}
                   </span>
@@ -283,16 +283,16 @@ export default function BuyerProfile() {
               </div>
             </div>
 
-            <div className="space-y-4 pt-4 border-t border-zinc-900/60">
-              <h3 className="text-xs font-bold text-zinc-400 uppercase tracking-wider flex items-center gap-2">
-                <Globe className="h-4 w-4 text-zinc-500" />
+            <div className="space-y-4 pt-4 border-t border-border">
+              <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wider flex items-center gap-2">
+                <Globe className="h-4 w-4 text-muted-foreground" />
                 <span>{COPY.buyers.fields.geographies}</span>
               </h3>
               <div className="flex flex-wrap gap-2">
                 {geographiesLabels.map((geo, idx) => (
                   <span
                     key={idx}
-                    className="px-3 py-1.5 bg-zinc-900 border border-zinc-800 text-zinc-300 text-xs font-semibold rounded-xl"
+                    className="px-3 py-1.5 bg-muted border border-border text-foreground text-xs font-semibold rounded-xl"
                   >
                     {geo}
                   </span>
@@ -302,8 +302,8 @@ export default function BuyerProfile() {
           </div>
 
           {/* Card 3: Verification Verification */}
-          <div className="bg-zinc-900/30 border border-zinc-900 rounded-2xl p-6 space-y-6">
-            <h2 className="text-sm font-bold text-zinc-300 uppercase tracking-wider flex items-center gap-2.5">
+          <div className="bg-card border border-border rounded-2xl p-6 space-y-6 shadow-sm">
+            <h2 className="text-sm font-bold text-foreground uppercase tracking-wider flex items-center gap-2.5">
               <ShieldCheck className="h-4.5 w-4.5 text-amber-500" />
               <span>Advisor Verification Checklist</span>
             </h2>
@@ -312,14 +312,14 @@ export default function BuyerProfile() {
               {/* Proof of Funds */}
               <div className={`p-4 rounded-xl border flex flex-col justify-between h-28 ${
                 buyer.proofOfFundsReviewed 
-                  ? "bg-emerald-500/5 border-emerald-500/10 text-emerald-400"
-                  : "bg-zinc-900/20 border-zinc-900 text-zinc-500"
+                  ? "bg-emerald-500/5 border-emerald-500/20 text-emerald-600 dark:text-emerald-400"
+                  : "bg-muted/10 border-border text-muted-foreground"
               }`}>
                 <div className="flex items-center justify-between">
                   <span className="text-[10px] font-bold uppercase tracking-wider">Proof of Funds</span>
                   {buyer.proofOfFundsReviewed ? <CheckCircle2 className="h-4.5 w-4.5" /> : <XCircle className="h-4.5 w-4.5" />}
                 </div>
-                <p className="text-xs font-bold text-zinc-300 mt-2">
+                <p className="text-xs font-bold text-foreground mt-2">
                   {buyer.proofOfFundsReviewed ? "Capital Verified" : "Pending Document"}
                 </p>
               </div>
@@ -327,14 +327,14 @@ export default function BuyerProfile() {
               {/* NDA Status */}
               <div className={`p-4 rounded-xl border flex flex-col justify-between h-28 ${
                 buyer.ndaSigned 
-                  ? "bg-emerald-500/5 border-emerald-500/10 text-emerald-400"
-                  : "bg-zinc-900/20 border-zinc-900 text-zinc-500"
+                  ? "bg-emerald-500/5 border-emerald-500/20 text-emerald-600 dark:text-emerald-400"
+                  : "bg-muted/10 border-border text-muted-foreground"
               }`}>
                 <div className="flex items-center justify-between">
                   <span className="text-[10px] font-bold uppercase tracking-wider">Signed NDA</span>
                   {buyer.ndaSigned ? <CheckCircle2 className="h-4.5 w-4.5" /> : <XCircle className="h-4.5 w-4.5" />}
                 </div>
-                <p className="text-xs font-bold text-zinc-300 mt-2">
+                <p className="text-xs font-bold text-foreground mt-2">
                   {buyer.ndaSigned ? "Corporate NDA Active" : "Unsigned NDA"}
                 </p>
               </div>
@@ -342,14 +342,14 @@ export default function BuyerProfile() {
               {/* Background check */}
               <div className={`p-4 rounded-xl border flex flex-col justify-between h-28 ${
                 buyer.backgroundCheckComplete 
-                  ? "bg-emerald-500/5 border-emerald-500/10 text-emerald-400"
-                  : "bg-zinc-900/20 border-zinc-900 text-zinc-500"
+                  ? "bg-emerald-500/5 border-emerald-500/20 text-emerald-600 dark:text-emerald-400"
+                  : "bg-muted/10 border-border text-muted-foreground"
               }`}>
                 <div className="flex items-center justify-between">
                   <span className="text-[10px] font-bold uppercase tracking-wider">Advisor Check</span>
                   {buyer.backgroundCheckComplete ? <CheckCircle2 className="h-4.5 w-4.5" /> : <XCircle className="h-4.5 w-4.5" />}
                 </div>
-                <p className="text-xs font-bold text-zinc-300 mt-2">
+                <p className="text-xs font-bold text-foreground mt-2">
                   {buyer.backgroundCheckComplete ? "Approved" : "In Progress"}
                 </p>
               </div>
@@ -359,37 +359,37 @@ export default function BuyerProfile() {
 
         {/* RIGHT COLUMN: CONFIDENTIAL ADVISOR NOTES */}
         <div className="space-y-8">
-          <div className="bg-zinc-900/30 border border-zinc-900 rounded-2xl p-6 flex flex-col h-full justify-between space-y-6">
+          <div className="bg-card border border-border rounded-2xl p-6 flex flex-col h-full justify-between space-y-6 shadow-sm">
             <div className="space-y-4">
-              <div className="flex items-center justify-between border-b border-zinc-900 pb-3">
-                <h3 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
+              <div className="flex items-center justify-between border-b border-border pb-3">
+                <h3 className="text-sm font-bold text-foreground uppercase tracking-wider flex items-center gap-2">
                   <Lock className="h-4 w-4 text-amber-500" />
                   <span>Confidential Notes</span>
                 </h3>
-                <span className="text-[9px] font-bold text-zinc-500 uppercase tracking-widest bg-zinc-950 px-2 py-0.5 rounded border border-zinc-900">
+                <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest bg-muted px-2 py-0.5 rounded border border-border">
                   Advisor Only
                 </span>
               </div>
               
               {buyer.notes ? (
-                <p className="text-xs leading-relaxed text-zinc-400 whitespace-pre-line bg-zinc-950/40 border border-zinc-900/50 p-4 rounded-xl">
+                <p className="text-xs leading-relaxed text-foreground whitespace-pre-line bg-muted/20 border border-border p-4 rounded-xl">
                   {buyer.notes}
                 </p>
               ) : (
-                <div className="p-8 text-center bg-zinc-950/20 border border-zinc-900/50 border-dashed rounded-xl">
-                  <p className="text-xs text-zinc-500">No advisor notes recorded for this buyer yet.</p>
+                <div className="p-8 text-center bg-muted/20 border border-border border-dashed rounded-xl">
+                  <p className="text-xs text-muted-foreground">No advisor notes recorded for this buyer yet.</p>
                 </div>
               )}
             </div>
 
-            <div className="p-4 bg-amber-500/5 border border-amber-500/10 rounded-xl space-y-2 mt-auto">
-              <div className="flex items-center gap-1.5 text-amber-400">
-                <Sparkles className="h-3.5 w-3.5" />
+            <div className="p-4 bg-amber-500/5 border border-amber-500/20 rounded-xl space-y-2 mt-auto">
+              <div className="flex items-center gap-1.5 text-amber-500">
+                <Sparkles className="h-3.5 w-3.5 animate-pulse" />
                 <span className="text-[10px] font-bold uppercase tracking-wider">
                   AI Matching Safeguard
                 </span>
               </div>
-              <p className="text-[10px] leading-relaxed text-zinc-400">
+              <p className="text-[10px] leading-relaxed text-muted-foreground">
                 These confidential advisor notes and the buyer&apos;s real name are strictly excluded from Claude Sonnet matching queries. AI indexing is built entirely off verified criteria structure.
               </p>
             </div>
