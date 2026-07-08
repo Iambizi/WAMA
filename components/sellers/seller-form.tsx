@@ -25,11 +25,19 @@ export interface SellerFormValues {
   yearsInOperation: number;
   transactionType: "full_sale" | "majority" | "minority" | "succession";
   reasonForSale: string;
-  financialStatementsAvailable: boolean;
-  taxReturnsAvailable: boolean;
-  leaseDocumentsAvailable: boolean;
-  corporateDocumentsAvailable: boolean;
-  ndaSigned: boolean;
+  dealDiscoveryMeeting: boolean;
+  dealNdaSigned: boolean;
+  dealDocumentsReceived: boolean;
+  dealPreliminaryAnalysisDone: boolean;
+  dealMandateProposal: boolean;
+  dealProposalSigned: boolean;
+  dealDocumentationReady: boolean;
+  docFinancialsCpa: boolean;
+  docFinancialsInterim: boolean;
+  docAccountsReceivable: boolean;
+  docAccountsPayable: boolean;
+  docEmployeeOrgChart: boolean;
+  docExecutiveSalaries: boolean;
   notes?: string;
 }
 
@@ -76,20 +84,22 @@ export function SellerForm({
   const [reasonForSale, setReasonForSale] = useState(initialValues?.reasonForSale || "");
   const [notes, setNotes] = useState(initialValues?.notes || "");
 
+  // Deal Readiness Checklist State
+  const [dealDiscoveryMeeting, setDealDiscoveryMeeting] = useState(initialValues?.dealDiscoveryMeeting || false);
+  const [dealNdaSigned, setDealNdaSigned] = useState(initialValues?.dealNdaSigned || false);
+  const [dealDocumentsReceived, setDealDocumentsReceived] = useState(initialValues?.dealDocumentsReceived || false);
+  const [dealPreliminaryAnalysisDone, setDealPreliminaryAnalysisDone] = useState(initialValues?.dealPreliminaryAnalysisDone || false);
+  const [dealMandateProposal, setDealMandateProposal] = useState(initialValues?.dealMandateProposal || false);
+  const [dealProposalSigned, setDealProposalSigned] = useState(initialValues?.dealProposalSigned || false);
+  const [dealDocumentationReady, setDealDocumentationReady] = useState(initialValues?.dealDocumentationReady || false);
+
   // Document Readiness Checklist State
-  const [financialStatementsAvailable, setFinancialStatementsAvailable] = useState(
-    initialValues?.financialStatementsAvailable || false
-  );
-  const [taxReturnsAvailable, setTaxReturnsAvailable] = useState(
-    initialValues?.taxReturnsAvailable || false
-  );
-  const [leaseDocumentsAvailable, setLeaseDocumentsAvailable] = useState(
-    initialValues?.leaseDocumentsAvailable || false
-  );
-  const [corporateDocumentsAvailable, setCorporateDocumentsAvailable] = useState(
-    initialValues?.corporateDocumentsAvailable || false
-  );
-  const [ndaSigned, setNdaSigned] = useState(initialValues?.ndaSigned || false);
+  const [docFinancialsCpa, setDocFinancialsCpa] = useState(initialValues?.docFinancialsCpa || false);
+  const [docFinancialsInterim, setDocFinancialsInterim] = useState(initialValues?.docFinancialsInterim || false);
+  const [docAccountsReceivable, setDocAccountsReceivable] = useState(initialValues?.docAccountsReceivable || false);
+  const [docAccountsPayable, setDocAccountsPayable] = useState(initialValues?.docAccountsPayable || false);
+  const [docEmployeeOrgChart, setDocEmployeeOrgChart] = useState(initialValues?.docEmployeeOrgChart || false);
+  const [docExecutiveSalaries, setDocExecutiveSalaries] = useState(initialValues?.docExecutiveSalaries || false);
 
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -121,11 +131,19 @@ export function SellerForm({
         yearsInOperation: Number(yearsInOperation),
         transactionType,
         reasonForSale,
-        financialStatementsAvailable,
-        taxReturnsAvailable,
-        leaseDocumentsAvailable,
-        corporateDocumentsAvailable,
-        ndaSigned,
+        dealDiscoveryMeeting,
+        dealNdaSigned,
+        dealDocumentsReceived,
+        dealPreliminaryAnalysisDone,
+        dealMandateProposal,
+        dealProposalSigned,
+        dealDocumentationReady,
+        docFinancialsCpa,
+        docFinancialsInterim,
+        docAccountsReceivable,
+        docAccountsPayable,
+        docEmployeeOrgChart,
+        docExecutiveSalaries,
         notes: notes.trim() ? notes : undefined,
       });
     } catch (err) {
@@ -364,75 +382,188 @@ export function SellerForm({
             </div>
           </div>
 
-          {/* Section 4: Document Readiness Checklist */}
+          {/* Section 4: Deal Readiness Checklist */}
           <div className="space-y-4">
             <h3 className="text-sm font-bold text-foreground/80 uppercase tracking-wider">
-              4. Document Readiness Checklist
+              4. Deal Readiness Tracker
             </h3>
 
-            <div className="bg-muted/40 border border-border p-5 rounded-2xl space-y-4 dark:bg-zinc-900/40 dark:border-zinc-800/80">
+            <div className="bg-muted/40 border border-border p-5 rounded-2xl space-y-3 dark:bg-zinc-900/40 dark:border-zinc-800/80">
               <label className="flex items-center gap-3 cursor-pointer group">
                 <input
                   type="checkbox"
-                  checked={financialStatementsAvailable}
-                  onChange={(e) => setFinancialStatementsAvailable(e.target.checked)}
+                  checked={dealDiscoveryMeeting}
+                  onChange={(e) => setDealDiscoveryMeeting(e.target.checked)}
                   className="h-4.5 w-4.5 bg-card border-border rounded focus:ring-0 text-amber-500 dark:bg-zinc-950 dark:border-zinc-800"
                   disabled={loading}
                 />
-                <span className="text-xs font-semibold text-muted-foreground group-hover:text-foreground transition-colors">
-                  {COPY.sellers.readinessChecklist.financialStatements}
+                <span className="text-xs font-semibold text-foreground/90 group-hover:text-foreground transition-colors">
+                  Discovery meeting completed
                 </span>
               </label>
 
               <label className="flex items-center gap-3 cursor-pointer group">
                 <input
                   type="checkbox"
-                  checked={taxReturnsAvailable}
-                  onChange={(e) => setTaxReturnsAvailable(e.target.checked)}
+                  checked={dealNdaSigned}
+                  onChange={(e) => setDealNdaSigned(e.target.checked)}
                   className="h-4.5 w-4.5 bg-card border-border rounded focus:ring-0 text-amber-500 dark:bg-zinc-950 dark:border-zinc-800"
                   disabled={loading}
                 />
-                <span className="text-xs font-semibold text-muted-foreground group-hover:text-foreground transition-colors">
-                  {COPY.sellers.readinessChecklist.taxReturns}
+                <span className="text-xs font-semibold text-foreground/90 group-hover:text-foreground transition-colors">
+                  NDA signed and active
                 </span>
               </label>
 
               <label className="flex items-center gap-3 cursor-pointer group">
                 <input
                   type="checkbox"
-                  checked={leaseDocumentsAvailable}
-                  onChange={(e) => setLeaseDocumentsAvailable(e.target.checked)}
+                  checked={dealDocumentsReceived}
+                  onChange={(e) => setDealDocumentsReceived(e.target.checked)}
                   className="h-4.5 w-4.5 bg-card border-border rounded focus:ring-0 text-amber-500 dark:bg-zinc-950 dark:border-zinc-800"
                   disabled={loading}
                 />
-                <span className="text-xs font-semibold text-muted-foreground group-hover:text-foreground transition-colors">
-                  {COPY.sellers.readinessChecklist.leaseDocuments}
+                <span className="text-xs font-semibold text-foreground/90 group-hover:text-foreground transition-colors">
+                  Intake documentation received
                 </span>
               </label>
 
               <label className="flex items-center gap-3 cursor-pointer group">
                 <input
                   type="checkbox"
-                  checked={corporateDocumentsAvailable}
-                  onChange={(e) => setCorporateDocumentsAvailable(e.target.checked)}
+                  checked={dealPreliminaryAnalysisDone}
+                  onChange={(e) => setDealPreliminaryAnalysisDone(e.target.checked)}
                   className="h-4.5 w-4.5 bg-card border-border rounded focus:ring-0 text-amber-500 dark:bg-zinc-950 dark:border-zinc-800"
                   disabled={loading}
                 />
-                <span className="text-xs font-semibold text-muted-foreground group-hover:text-foreground transition-colors">
-                  {COPY.sellers.readinessChecklist.corporateDocuments}
+                <span className="text-xs font-semibold text-foreground/90 group-hover:text-foreground transition-colors">
+                  Preliminary analysis completed
                 </span>
               </label>
 
               <label className="flex items-center gap-3 cursor-pointer group">
                 <input
                   type="checkbox"
-                  checked={ndaSigned}
-                  onChange={(e) => setNdaSigned(e.target.checked)}
+                  checked={dealMandateProposal}
+                  onChange={(e) => setDealMandateProposal(e.target.checked)}
                   className="h-4.5 w-4.5 bg-card border-border rounded focus:ring-0 text-amber-500 dark:bg-zinc-950 dark:border-zinc-800"
                   disabled={loading}
                 />
-                <span className="text-xs font-semibold text-muted-foreground group-hover:text-foreground transition-colors">
-                  {COPY.sellers.readinessChecklist.ndaSigned}
+                <span className="text-xs font-semibold text-foreground/90 group-hover:text-foreground transition-colors">
+                  Mandate proposal sent
+                </span>
+              </label>
+
+              <label className="flex items-center gap-3 cursor-pointer group">
+                <input
+                  type="checkbox"
+                  checked={dealProposalSigned}
+                  onChange={(e) => setDealProposalSigned(e.target.checked)}
+                  className="h-4.5 w-4.5 bg-card border-border rounded focus:ring-0 text-amber-500 dark:bg-zinc-950 dark:border-zinc-800"
+                  disabled={loading}
+                />
+                <span className="text-xs font-semibold text-foreground/90 group-hover:text-foreground transition-colors">
+                  Mandate agreement signed
+                </span>
+              </label>
+
+              <label className="flex items-center gap-3 cursor-pointer group">
+                <input
+                  type="checkbox"
+                  checked={dealDocumentationReady}
+                  onChange={(e) => setDealDocumentationReady(e.target.checked)}
+                  className="h-4.5 w-4.5 bg-card border-border rounded focus:ring-0 text-amber-500 dark:bg-zinc-950 dark:border-zinc-800"
+                  disabled={loading}
+                />
+                <span className="text-xs font-semibold text-foreground/90 group-hover:text-foreground transition-colors">
+                  Marketing files ready (Teaser, CIM, Data Room)
+                </span>
+              </label>
+            </div>
+          </div>
+
+          {/* Section 5: Document Readiness Checklist */}
+          <div className="space-y-4">
+            <h3 className="text-sm font-bold text-foreground/80 uppercase tracking-wider">
+              5. Mandate Document Checklist (Readiness Score impact)
+            </h3>
+
+            <div className="bg-muted/40 border border-border p-5 rounded-2xl space-y-3 dark:bg-zinc-900/40 dark:border-zinc-800/80">
+              <label className="flex items-center gap-3 cursor-pointer group">
+                <input
+                  type="checkbox"
+                  checked={docFinancialsCpa}
+                  onChange={(e) => setDocFinancialsCpa(e.target.checked)}
+                  className="h-4.5 w-4.5 bg-card border-border rounded focus:ring-0 text-amber-500 dark:bg-zinc-950 dark:border-zinc-800"
+                  disabled={loading}
+                />
+                <span className="text-xs font-semibold text-foreground/90 group-hover:text-foreground transition-colors">
+                  CPA-signed financials (last 5 fiscal years)
+                </span>
+              </label>
+
+              <label className="flex items-center gap-3 cursor-pointer group">
+                <input
+                  type="checkbox"
+                  checked={docFinancialsInterim}
+                  onChange={(e) => setDocFinancialsInterim(e.target.checked)}
+                  className="h-4.5 w-4.5 bg-card border-border rounded focus:ring-0 text-amber-500 dark:bg-zinc-950 dark:border-zinc-800"
+                  disabled={loading}
+                />
+                <span className="text-xs font-semibold text-foreground/90 group-hover:text-foreground transition-colors">
+                  Interim financials for current year (internal)
+                </span>
+              </label>
+
+              <label className="flex items-center gap-3 cursor-pointer group">
+                <input
+                  type="checkbox"
+                  checked={docAccountsReceivable}
+                  onChange={(e) => setDocAccountsReceivable(e.target.checked)}
+                  className="h-4.5 w-4.5 bg-card border-border rounded focus:ring-0 text-amber-500 dark:bg-zinc-950 dark:border-zinc-800"
+                  disabled={loading}
+                />
+                <span className="text-xs font-semibold text-foreground/90 group-hover:text-foreground transition-colors">
+                  Detailed accounts receivable list (A/R)
+                </span>
+              </label>
+
+              <label className="flex items-center gap-3 cursor-pointer group">
+                <input
+                  type="checkbox"
+                  checked={docAccountsPayable}
+                  onChange={(e) => setDocAccountsPayable(e.target.checked)}
+                  className="h-4.5 w-4.5 bg-card border-border rounded focus:ring-0 text-amber-500 dark:bg-zinc-950 dark:border-zinc-800"
+                  disabled={loading}
+                />
+                <span className="text-xs font-semibold text-foreground/90 group-hover:text-foreground transition-colors">
+                  Detailed accounts payable list (A/P)
+                </span>
+              </label>
+
+              <label className="flex items-center gap-3 cursor-pointer group">
+                <input
+                  type="checkbox"
+                  checked={docEmployeeOrgChart}
+                  onChange={(e) => setDocEmployeeOrgChart(e.target.checked)}
+                  className="h-4.5 w-4.5 bg-card border-border rounded focus:ring-0 text-amber-500 dark:bg-zinc-950 dark:border-zinc-800"
+                  disabled={loading}
+                />
+                <span className="text-xs font-semibold text-foreground/90 group-hover:text-foreground transition-colors">
+                  Employee organizational chart
+                </span>
+              </label>
+
+              <label className="flex items-center gap-3 cursor-pointer group">
+                <input
+                  type="checkbox"
+                  checked={docExecutiveSalaries}
+                  onChange={(e) => setDocExecutiveSalaries(e.target.checked)}
+                  className="h-4.5 w-4.5 bg-card border-border rounded focus:ring-0 text-amber-500 dark:bg-zinc-950 dark:border-zinc-800"
+                  disabled={loading}
+                />
+                <span className="text-xs font-semibold text-foreground/90 group-hover:text-foreground transition-colors">
+                  Salaries of executives and employees
                 </span>
               </label>
             </div>
@@ -440,7 +571,7 @@ export function SellerForm({
         </div>
       </div>
 
-      {/* Section 5: AI Match Ready Summaries & Notes */}
+      {/* Section 6: AI Match Ready Summaries & Notes */}
       <div className="grid grid-cols-1 gap-6 pt-6 border-t border-border">
         <div className="space-y-2">
           <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">

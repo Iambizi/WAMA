@@ -17,6 +17,9 @@ export default defineSchema({
       v.literal("cash"),
       v.literal("financed"),
       v.literal("mixed"),
+      v.literal("vtb"),
+      v.literal("mezzanine"),
+      v.literal("equity_partner"),
       v.literal("unknown")
     ),
     acquisitionExperience: v.union(
@@ -30,6 +33,14 @@ export default defineSchema({
       v.literal("12_24mo"),
       v.literal("24mo_plus")
     ),
+    experienceDetail: v.optional(v.string()),
+    downPaymentAmount: v.optional(v.number()),
+    sourceOfFunds: v.optional(v.string()),
+    targetBusinessValue: v.optional(v.number()),
+    minEbitda: v.optional(v.number()),
+    minEmployees: v.optional(v.number()),
+    minTimeInBusiness: v.optional(v.number()),
+    clientConcentration: v.optional(v.string()),
 
     // Readiness checklist
     proofOfFundsReviewed: v.boolean(),
@@ -90,12 +101,22 @@ export default defineSchema({
     ),
     reasonForSale: v.string(),       // Free text — advisor-summarized, not raw seller input
 
-    // Document readiness checklist (no file storage)
-    financialStatementsAvailable: v.boolean(),
-    taxReturnsAvailable: v.boolean(),
-    leaseDocumentsAvailable: v.boolean(),
-    corporateDocumentsAvailable: v.boolean(),
-    ndaSigned: v.boolean(),
+    // Deal readiness checklist
+    dealDiscoveryMeeting: v.boolean(),
+    dealNdaSigned: v.boolean(),
+    dealDocumentsReceived: v.boolean(),
+    dealPreliminaryAnalysisDone: v.boolean(),
+    dealMandateProposal: v.boolean(),
+    dealProposalSigned: v.boolean(),
+    dealDocumentationReady: v.boolean(),
+
+    // Document readiness checklist
+    docFinancialsCpa: v.boolean(),
+    docFinancialsInterim: v.boolean(),
+    docAccountsReceivable: v.boolean(),
+    docAccountsPayable: v.boolean(),
+    docEmployeeOrgChart: v.boolean(),
+    docExecutiveSalaries: v.boolean(),
 
     // Qualification
     qualificationStatus: v.union(
@@ -103,7 +124,7 @@ export default defineSchema({
       v.literal("qualified"),
       v.literal("disqualified")
     ),
-    readinessScore: v.optional(v.number()),  // 0–100, computed from checklist
+    readinessScore: v.optional(v.number()),  // 0–100, computed from document checklist
 
     // Internal
     userId: v.optional(v.id("users")),
@@ -144,6 +165,8 @@ export default defineSchema({
       )
     ),
     advisorNotes: v.optional(v.string()),
+    dealValue: v.optional(v.number()),
+    targetCloseDate: v.optional(v.number()),
     createdAt: v.number(),
     updatedAt: v.number(),
   }).index("by_seller", ["sellerId"])

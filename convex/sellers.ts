@@ -4,21 +4,23 @@ import { requireAdvisor } from "./activityLogs";
 
 // Compute Document Readiness Score from the 5 boolean checklist flags
 function computeReadinessScore(args: {
-  financialStatementsAvailable: boolean;
-  taxReturnsAvailable: boolean;
-  leaseDocumentsAvailable: boolean;
-  corporateDocumentsAvailable: boolean;
-  ndaSigned: boolean;
+  docFinancialsCpa: boolean;
+  docFinancialsInterim: boolean;
+  docAccountsReceivable: boolean;
+  docAccountsPayable: boolean;
+  docEmployeeOrgChart: boolean;
+  docExecutiveSalaries: boolean;
 }): number {
   const flags = [
-    args.financialStatementsAvailable,
-    args.taxReturnsAvailable,
-    args.leaseDocumentsAvailable,
-    args.corporateDocumentsAvailable,
-    args.ndaSigned,
+    args.docFinancialsCpa,
+    args.docFinancialsInterim,
+    args.docAccountsReceivable,
+    args.docAccountsPayable,
+    args.docEmployeeOrgChart,
+    args.docExecutiveSalaries,
   ];
   const trueCount = flags.filter(Boolean).length;
-  return trueCount * 20; // 5 fields * 20% = 100%
+  return Math.round((trueCount / 6) * 100);
 }
 
 // List all sellers
@@ -115,11 +117,19 @@ export const create = mutation({
       v.literal("succession")
     ),
     reasonForSale: v.string(),
-    financialStatementsAvailable: v.boolean(),
-    taxReturnsAvailable: v.boolean(),
-    leaseDocumentsAvailable: v.boolean(),
-    corporateDocumentsAvailable: v.boolean(),
-    ndaSigned: v.boolean(),
+    dealDiscoveryMeeting: v.boolean(),
+    dealNdaSigned: v.boolean(),
+    dealDocumentsReceived: v.boolean(),
+    dealPreliminaryAnalysisDone: v.boolean(),
+    dealMandateProposal: v.boolean(),
+    dealProposalSigned: v.boolean(),
+    dealDocumentationReady: v.boolean(),
+    docFinancialsCpa: v.boolean(),
+    docFinancialsInterim: v.boolean(),
+    docAccountsReceivable: v.boolean(),
+    docAccountsPayable: v.boolean(),
+    docEmployeeOrgChart: v.boolean(),
+    docExecutiveSalaries: v.boolean(),
     notes: v.optional(v.string()),
   },
   handler: async (
@@ -137,11 +147,19 @@ export const create = mutation({
       yearsInOperation: number;
       transactionType: "full_sale" | "majority" | "minority" | "succession";
       reasonForSale: string;
-      financialStatementsAvailable: boolean;
-      taxReturnsAvailable: boolean;
-      leaseDocumentsAvailable: boolean;
-      corporateDocumentsAvailable: boolean;
-      ndaSigned: boolean;
+      dealDiscoveryMeeting: boolean;
+      dealNdaSigned: boolean;
+      dealDocumentsReceived: boolean;
+      dealPreliminaryAnalysisDone: boolean;
+      dealMandateProposal: boolean;
+      dealProposalSigned: boolean;
+      dealDocumentationReady: boolean;
+      docFinancialsCpa: boolean;
+      docFinancialsInterim: boolean;
+      docAccountsReceivable: boolean;
+      docAccountsPayable: boolean;
+      docEmployeeOrgChart: boolean;
+      docExecutiveSalaries: boolean;
       notes?: string;
     }
   ) => {
@@ -233,11 +251,19 @@ export const update = mutation({
       v.literal("succession")
     ),
     reasonForSale: v.string(),
-    financialStatementsAvailable: v.boolean(),
-    taxReturnsAvailable: v.boolean(),
-    leaseDocumentsAvailable: v.boolean(),
-    corporateDocumentsAvailable: v.boolean(),
-    ndaSigned: v.boolean(),
+    dealDiscoveryMeeting: v.boolean(),
+    dealNdaSigned: v.boolean(),
+    dealDocumentsReceived: v.boolean(),
+    dealPreliminaryAnalysisDone: v.boolean(),
+    dealMandateProposal: v.boolean(),
+    dealProposalSigned: v.boolean(),
+    dealDocumentationReady: v.boolean(),
+    docFinancialsCpa: v.boolean(),
+    docFinancialsInterim: v.boolean(),
+    docAccountsReceivable: v.boolean(),
+    docAccountsPayable: v.boolean(),
+    docEmployeeOrgChart: v.boolean(),
+    docExecutiveSalaries: v.boolean(),
     notes: v.optional(v.string()),
   },
   handler: async (
@@ -256,11 +282,19 @@ export const update = mutation({
       yearsInOperation: number;
       transactionType: "full_sale" | "majority" | "minority" | "succession";
       reasonForSale: string;
-      financialStatementsAvailable: boolean;
-      taxReturnsAvailable: boolean;
-      leaseDocumentsAvailable: boolean;
-      corporateDocumentsAvailable: boolean;
-      ndaSigned: boolean;
+      dealDiscoveryMeeting: boolean;
+      dealNdaSigned: boolean;
+      dealDocumentsReceived: boolean;
+      dealPreliminaryAnalysisDone: boolean;
+      dealMandateProposal: boolean;
+      dealProposalSigned: boolean;
+      dealDocumentationReady: boolean;
+      docFinancialsCpa: boolean;
+      docFinancialsInterim: boolean;
+      docAccountsReceivable: boolean;
+      docAccountsPayable: boolean;
+      docEmployeeOrgChart: boolean;
+      docExecutiveSalaries: boolean;
       notes?: string;
     }
   ) => {

@@ -262,6 +262,76 @@ export default function BuyerProfile() {
                 </p>
               </div>
             </div>
+
+            {/* Expanded Budget & Capital Parameters */}
+            <div className="pt-4 border-t border-border space-y-4">
+              <h3 className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
+                Capital & Operational Requirements
+              </h3>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <span className="text-[10px] text-muted-foreground font-semibold">Down Payment</span>
+                  <p className="text-xs font-bold text-foreground">
+                    {buyer.downPaymentAmount ? formatCAD(buyer.downPaymentAmount) : "Not Specified"}
+                  </p>
+                </div>
+
+                <div className="space-y-1">
+                  <span className="text-[10px] text-muted-foreground font-semibold">Source of Funds</span>
+                  <p className="text-xs font-bold text-foreground">
+                    {buyer.sourceOfFunds || "Not Specified"}
+                  </p>
+                </div>
+
+                <div className="space-y-1">
+                  <span className="text-[10px] text-muted-foreground font-semibold">Target Business Value</span>
+                  <p className="text-xs font-bold text-foreground">
+                    {buyer.targetBusinessValue ? formatCAD(buyer.targetBusinessValue) : "Not Specified"}
+                  </p>
+                </div>
+
+                <div className="space-y-1">
+                  <span className="text-[10px] text-muted-foreground font-semibold">Minimum EBITDA</span>
+                  <p className="text-xs font-bold text-foreground">
+                    {buyer.minEbitda ? formatCAD(buyer.minEbitda) : "Not Specified"}
+                  </p>
+                </div>
+
+                <div className="space-y-1">
+                  <span className="text-[10px] text-muted-foreground font-semibold">Minimum Employees</span>
+                  <p className="text-xs font-bold text-foreground">
+                    {buyer.minEmployees !== undefined ? `${buyer.minEmployees} employees` : "Not Specified"}
+                  </p>
+                </div>
+
+                <div className="space-y-1">
+                  <span className="text-[10px] text-muted-foreground font-semibold">Minimum Years in Business</span>
+                  <p className="text-xs font-bold text-foreground">
+                    {buyer.minTimeInBusiness !== undefined ? `${buyer.minTimeInBusiness} years` : "Not Specified"}
+                  </p>
+                </div>
+              </div>
+
+              <div className="space-y-1 pt-2">
+                <span className="text-[10px] text-muted-foreground font-semibold">Client Concentration Tolerance</span>
+                <p className="text-xs font-bold text-foreground bg-muted/20 border border-border px-3.5 py-2.5 rounded-xl">
+                  {buyer.clientConcentration || "Not Specified"}
+                </p>
+              </div>
+            </div>
+
+            {/* Experience Detail */}
+            {buyer.experienceDetail && (
+              <div className="pt-4 border-t border-border space-y-2">
+                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">
+                  Detailed Experience Background
+                </span>
+                <p className="text-xs leading-relaxed text-foreground bg-muted/20 border border-border p-4 rounded-xl">
+                  {buyer.experienceDetail}
+                </p>
+              </div>
+            )}
           </div>
 
           {/* Card 2: Sector & Geographic Tags */}
@@ -406,20 +476,20 @@ export default function BuyerProfile() {
             className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 transition-opacity duration-300"
           />
           {/* Sheet */}
-          <div className="fixed right-0 top-0 bottom-0 w-full max-w-3xl bg-zinc-950 border-l border-zinc-900 shadow-2xl p-8 overflow-y-auto z-50 transform transition-transform duration-300 animate-in slide-in-from-right">
-            <div className="flex items-center justify-between border-b border-zinc-900 pb-4 mb-8">
+          <div className="fixed right-0 top-0 bottom-0 w-full max-w-3xl bg-card border-l border-border shadow-2xl p-8 overflow-y-auto z-50 transform transition-transform duration-300 animate-in slide-in-from-right text-foreground">
+            <div className="flex items-center justify-between border-b border-border pb-4 mb-8">
               <div className="space-y-1">
-                <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                <h3 className="text-lg font-bold text-foreground flex items-center gap-2">
                   <Edit className="h-5 w-5 text-amber-500" />
                   <span>Edit Buyer Criteria</span>
                 </h3>
-                <p className="text-[11px] text-zinc-400">
+                <p className="text-[11px] text-muted-foreground">
                   Update active buy-side investment mandates and checklist status.
                 </p>
               </div>
               <button 
                 onClick={() => setIsEditing(false)}
-                className="p-2 bg-zinc-900 hover:bg-zinc-800 rounded-xl text-zinc-400 hover:text-zinc-200 transition-colors text-xs font-semibold"
+                className="p-2 bg-muted hover:bg-muted/80 rounded-xl text-muted-foreground hover:text-foreground transition-colors text-xs font-semibold"
               >
                 Close
               </button>
@@ -437,6 +507,14 @@ export default function BuyerProfile() {
                 financingType: buyer.financingType,
                 acquisitionExperience: buyer.acquisitionExperience,
                 acquisitionTimeline: buyer.acquisitionTimeline,
+                experienceDetail: buyer.experienceDetail,
+                downPaymentAmount: buyer.downPaymentAmount,
+                sourceOfFunds: buyer.sourceOfFunds,
+                targetBusinessValue: buyer.targetBusinessValue,
+                minEbitda: buyer.minEbitda,
+                minEmployees: buyer.minEmployees,
+                minTimeInBusiness: buyer.minTimeInBusiness,
+                clientConcentration: buyer.clientConcentration,
                 proofOfFundsReviewed: buyer.proofOfFundsReviewed,
                 ndaSigned: buyer.ndaSigned,
                 backgroundCheckComplete: buyer.backgroundCheckComplete,

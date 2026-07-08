@@ -28,6 +28,30 @@
 
 ---
 
+## Session 15 — 2026-07-07
+**Agent:** Antigravity
+**Step:** Step 8 — M&A Advisor Feedback & Form Styling
+**Status:** ✅ Complete
+
+### What Was Done
+- **Implemented Database Schema Changes**: Added expanded capital parameters (`downPaymentAmount`, `sourceOfFunds`, `targetBusinessValue`, `minEbitda`, `minEmployees`, `minTimeInBusiness`, `clientConcentration`) and experience history fields to `buyers` table. Added 7 deal readiness states and 6 CPA document checklists to `sellers` table. Added custom deal terms (`dealValue`, `targetCloseDate`) to `matches` table.
+- **Updated Convex Mutations & Queries**: Refactored sellers/buyers queries to save/retrieve new variables. Upgraded `computeReadinessScore` to compute the readiness percentage based on the 6 new CPA checklists (16.6% per item, rounding to 100%).
+- **Enhanced AI Prompt Engine Payload**: Mapped the new criteria (capital details, years, employee criteria, and professional experience) into the prompt system for de-identified matching, improving suggestion context.
+- **Fixed accessibility form colors**: Updated sheet container layouts in buyers and sellers pages from hardcoded `bg-zinc-950` to theme variables (`bg-card`, `border-border`, `text-foreground`), correcting low-contrast checklist gray-on-black color display bugs.
+- **Created William Orientation Briefing**: Documented deployment instructions and de-identification AI privacy boundaries, providing reassurance about AES-256 db encryption and Claude sandbox controls.
+- **Verified Build Passes**: Successfully built application with `npm run build` checking Next.js 16/Convex compiling loops.
+
+### Decisions Made
+- Maintained strict de-identification rules: all new buyer criteria fields are sent to AI, but raw user identities, name strings, and advisor notes are kept private in the local database.
+
+### Open Questions / Blockers
+- None.
+
+### Next Steps
+- Deliver briefing doc to William and begin production testing.
+
+---
+
 ## Session 14 — 2026-07-07
 **Agent:** Antigravity
 **Step:** Step 7 — Polish (Auth Middleware & Page Styling Refactor)

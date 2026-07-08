@@ -74,6 +74,14 @@ export async function POST(req: NextRequest) {
         financingType: b.financingType,
         acquisitionExperience: b.acquisitionExperience,
         acquisitionTimeline: b.acquisitionTimeline,
+        experienceDetail: b.experienceDetail || "",
+        downPaymentAmount: b.downPaymentAmount,
+        sourceOfFunds: b.sourceOfFunds || "",
+        targetBusinessValue: b.targetBusinessValue,
+        minEbitda: b.minEbitda,
+        minEmployees: b.minEmployees,
+        minTimeInBusiness: b.minTimeInBusiness,
+        clientConcentration: b.clientConcentration || "",
       };
     });
 
@@ -85,7 +93,7 @@ Rules:
 - Only use the structured criteria provided. Do not infer or hallucinate details.
 - Score each buyer from 0 to 100 based on fit with the seller.
 - Explain your reasoning in plain language (2–3 sentences max per match).
-- List which specific criteria aligned (e.g. "sector", "budget", "geography", "timeline").
+- List which specific criteria aligned (e.g. "sector", "budget", "geography", "timeline", "ebitda", "employees", "experience").
 - Return ONLY valid JSON. No preamble, no markdown.
 
 Response format:
@@ -120,6 +128,14 @@ ${sanitizedBuyers.map((b) => `
   Financing: ${b.financingType}
   Experience: ${b.acquisitionExperience}
   Timeline: ${b.acquisitionTimeline}
+  Experience Details: ${b.experienceDetail || "None provided"}
+  Down Payment: ${b.downPaymentAmount ? `${b.downPaymentAmount} CAD` : "Not Specified"}
+  Source of Funds: ${b.sourceOfFunds || "Not Specified"}
+  Target Business Value: ${b.targetBusinessValue ? `${b.targetBusinessValue} CAD` : "Not Specified"}
+  Min EBITDA Wanted: ${b.minEbitda ? `${b.minEbitda} CAD` : "Not Specified"}
+  Min Employees: ${b.minEmployees !== undefined ? b.minEmployees : "Not Specified"}
+  Time in Business Preference: ${b.minTimeInBusiness !== undefined ? `${b.minTimeInBusiness} years minimum` : "Not Specified"}
+  Client Concentration Tolerance: ${b.clientConcentration || "Not Specified"}
 `).join("")}
 
 Return the top matches ranked by score descending. Include all buyers with a score above 30.`;

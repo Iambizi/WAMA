@@ -37,11 +37,12 @@ export default function SellerDashboard() {
   }
 
   const checklistItems = [
-    { label: "Financial Statements Available", value: profile.financialStatementsAvailable },
-    { label: "Tax Returns Available", value: profile.taxReturnsAvailable },
-    { label: "Lease Documents Available", value: profile.leaseDocumentsAvailable },
-    { label: "Corporate Documents Available", value: profile.corporateDocumentsAvailable },
-    { label: "NDA Signed", value: profile.ndaSigned },
+    { label: "CPA-signed Financials (last 5 years)", value: profile.docFinancialsCpa },
+    { label: "Interim Financials (current year)", value: profile.docFinancialsInterim },
+    { label: "Detailed Accounts Receivable (A/R)", value: profile.docAccountsReceivable },
+    { label: "Detailed Accounts Payable (A/P)", value: profile.docAccountsPayable },
+    { label: "Employee Org Chart", value: profile.docEmployeeOrgChart },
+    { label: "Executive & Employee Salaries", value: profile.docExecutiveSalaries },
   ];
   const completedCount = checklistItems.filter((i) => i.value).length;
 
@@ -110,13 +111,13 @@ export default function SellerDashboard() {
           </div>
           <div className="flex items-baseline gap-1.5">
             <span className="text-3xl font-extrabold tracking-tight">{completedCount}</span>
-            <span className="text-sm text-muted-foreground">/ 5 verified</span>
+            <span className="text-sm text-muted-foreground">/ 6 verified</span>
           </div>
           {/* Progress bar */}
           <div className="mt-4 h-2 w-full rounded-full bg-muted overflow-hidden">
             <div
               className="h-full bg-gradient-to-r from-primary to-indigo-500 transition-all duration-500"
-              style={{ width: `${(completedCount / 5) * 100}%` }}
+              style={{ width: `${(completedCount / 6) * 100}%` }}
             />
           </div>
         </div>

@@ -217,6 +217,8 @@ export const updateStatus = mutation({
         v.literal("introduced")
       )
     ),
+    dealValue: v.optional(v.number()),
+    targetCloseDate: v.optional(v.number()),
   },
   handler: async (
     ctx: MutationCtx,
@@ -234,6 +236,8 @@ export const updateStatus = mutation({
         | "rejected";
       advisorNotes?: string;
       buyerAccessStatus?: "hidden" | "teaser_shared" | "nda_required" | "intro_approved" | "introduced";
+      dealValue?: number;
+      targetCloseDate?: number;
     }
   ) => {
     await requireAdvisor(ctx);
@@ -247,6 +251,8 @@ export const updateStatus = mutation({
       status: args.status,
       advisorNotes: args.advisorNotes !== undefined ? args.advisorNotes : existing.advisorNotes,
       buyerAccessStatus: args.buyerAccessStatus !== undefined ? args.buyerAccessStatus : (existing.buyerAccessStatus || "hidden"),
+      dealValue: args.dealValue !== undefined ? args.dealValue : existing.dealValue,
+      targetCloseDate: args.targetCloseDate !== undefined ? args.targetCloseDate : existing.targetCloseDate,
       updatedAt: now,
     });
 

@@ -25,9 +25,12 @@ export const GEOGRAPHIES = [
 ] as const;
 
 export const FINANCING_TYPES = [
-  { value: "cash", label: "All Cash / Self-Funded" },
-  { value: "financed", label: "Leveraged / Bank Financed" },
-  { value: "mixed", label: "Mixed Cash and Debt" },
+  { value: "cash", label: "All Cash / Self-Funded (Fonds propres)" },
+  { value: "financed", label: "Leveraged / Bank Financed (Dette senior / Bancaire)" },
+  { value: "mixed", label: "Mixed Cash and Debt (Mixte)" },
+  { value: "vtb", label: "Vendor Take-Back (VTB) / Balance de vente (BPV)" },
+  { value: "mezzanine", label: "Mezzanine / Subordinated Debt" },
+  { value: "equity_partner", label: "Private Equity / Financial Partner" },
   { value: "unknown", label: "Unspecified / Flexible" },
 ] as const;
 

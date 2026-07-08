@@ -20,9 +20,17 @@ export interface BuyerFormValues {
   budgetMin: number;
   budgetMax: number;
   geography: string[];
-  financingType: "cash" | "financed" | "mixed" | "unknown";
+  financingType: "cash" | "financed" | "mixed" | "vtb" | "mezzanine" | "equity_partner" | "unknown";
   acquisitionExperience: "first_time" | "experienced" | "serial";
   acquisitionTimeline: "0_6mo" | "6_12mo" | "12_24mo" | "24mo_plus";
+  experienceDetail?: string;
+  downPaymentAmount?: number;
+  sourceOfFunds?: string;
+  targetBusinessValue?: number;
+  minEbitda?: number;
+  minEmployees?: number;
+  minTimeInBusiness?: number;
+  clientConcentration?: string;
   proofOfFundsReviewed: boolean;
   ndaSigned: boolean;
   backgroundCheckComplete: boolean;
@@ -51,9 +59,17 @@ export function BuyerForm({
   const [phone, setPhone] = useState(initialValues?.phone || "");
   const [budgetMin, setBudgetMin] = useState(initialValues?.budgetMin || 0);
   const [budgetMax, setBudgetMax] = useState(initialValues?.budgetMax || 1000000);
-  const [financingType, setFinancingType] = useState(initialValues?.financingType || "unknown");
+  const [financingType, setFinancingType] = useState<BuyerFormValues["financingType"]>(initialValues?.financingType || "unknown");
   const [acquisitionExperience, setAcquisitionExperience] = useState(initialValues?.acquisitionExperience || "first_time");
   const [acquisitionTimeline, setAcquisitionTimeline] = useState(initialValues?.acquisitionTimeline || "6_12mo");
+  const [experienceDetail, setExperienceDetail] = useState(initialValues?.experienceDetail || "");
+  const [downPaymentAmount, setDownPaymentAmount] = useState<number | "">(initialValues?.downPaymentAmount !== undefined ? initialValues.downPaymentAmount : "");
+  const [sourceOfFunds, setSourceOfFunds] = useState(initialValues?.sourceOfFunds || "");
+  const [targetBusinessValue, setTargetBusinessValue] = useState<number | "">(initialValues?.targetBusinessValue !== undefined ? initialValues.targetBusinessValue : "");
+  const [minEbitda, setMinEbitda] = useState<number | "">(initialValues?.minEbitda !== undefined ? initialValues.minEbitda : "");
+  const [minEmployees, setMinEmployees] = useState<number | "">(initialValues?.minEmployees !== undefined ? initialValues.minEmployees : "");
+  const [minTimeInBusiness, setMinTimeInBusiness] = useState<number | "">(initialValues?.minTimeInBusiness !== undefined ? initialValues.minTimeInBusiness : "");
+  const [clientConcentration, setClientConcentration] = useState(initialValues?.clientConcentration || "");
   const [notes, setNotes] = useState(initialValues?.notes || "");
 
   // Checklist states
@@ -102,6 +118,14 @@ export function BuyerForm({
         financingType,
         acquisitionExperience,
         acquisitionTimeline,
+        experienceDetail: experienceDetail.trim() ? experienceDetail : undefined,
+        downPaymentAmount: downPaymentAmount !== "" ? Number(downPaymentAmount) : undefined,
+        sourceOfFunds: sourceOfFunds.trim() ? sourceOfFunds : undefined,
+        targetBusinessValue: targetBusinessValue !== "" ? Number(targetBusinessValue) : undefined,
+        minEbitda: minEbitda !== "" ? Number(minEbitda) : undefined,
+        minEmployees: minEmployees !== "" ? Number(minEmployees) : undefined,
+        minTimeInBusiness: minTimeInBusiness !== "" ? Number(minTimeInBusiness) : undefined,
+        clientConcentration: clientConcentration.trim() ? clientConcentration : undefined,
         proofOfFundsReviewed,
         ndaSigned,
         backgroundCheckComplete,
@@ -228,7 +252,7 @@ export function BuyerForm({
               </label>
               <select
                 value={financingType}
-                onChange={(e) => setFinancingType(e.target.value as "cash" | "financed" | "mixed" | "unknown")}
+                onChange={(e) => setFinancingType(e.target.value as BuyerFormValues["financingType"])}
                 className="w-full px-4 py-2.5 bg-card border border-border rounded-xl text-sm text-foreground outline-none focus:border-muted-foreground/50 transition-colors dark:bg-zinc-900 dark:border-zinc-800 dark:text-white dark:focus:border-zinc-700"
                 disabled={loading}
               >
@@ -238,6 +262,110 @@ export function BuyerForm({
                   </option>
                 ))}
               </select>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">
+                  Down Payment (CAD)
+                </label>
+                <input
+                  type="number"
+                  value={downPaymentAmount}
+                  onChange={(e) => setDownPaymentAmount(e.target.value === "" ? "" : Number(e.target.value))}
+                  placeholder="e.g. 500000"
+                  className="w-full px-4 py-2.5 bg-card border border-border rounded-xl text-sm text-foreground placeholder-muted-foreground outline-none focus:border-muted-foreground/50 transition-colors dark:bg-zinc-900 dark:border-zinc-800 dark:text-white"
+                  disabled={loading}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">
+                  Source of Funds
+                </label>
+                <input
+                  type="text"
+                  value={sourceOfFunds}
+                  onChange={(e) => setSourceOfFunds(e.target.value)}
+                  placeholder="e.g. Personal savings, Equity partner"
+                  className="w-full px-4 py-2.5 bg-card border border-border rounded-xl text-sm text-foreground placeholder-muted-foreground outline-none focus:border-muted-foreground/50 transition-colors dark:bg-zinc-900 dark:border-zinc-800 dark:text-white"
+                  disabled={loading}
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">
+                  Target Business Value (CAD)
+                </label>
+                <input
+                  type="number"
+                  value={targetBusinessValue}
+                  onChange={(e) => setTargetBusinessValue(e.target.value === "" ? "" : Number(e.target.value))}
+                  placeholder="e.g. 3000000"
+                  className="w-full px-4 py-2.5 bg-card border border-border rounded-xl text-sm text-foreground placeholder-muted-foreground outline-none focus:border-muted-foreground/50 transition-colors dark:bg-zinc-900 dark:border-zinc-800 dark:text-white"
+                  disabled={loading}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">
+                  Min EBITDA Desired (CAD)
+                </label>
+                <input
+                  type="number"
+                  value={minEbitda}
+                  onChange={(e) => setMinEbitda(e.target.value === "" ? "" : Number(e.target.value))}
+                  placeholder="e.g. 250000"
+                  className="w-full px-4 py-2.5 bg-card border border-border rounded-xl text-sm text-foreground placeholder-muted-foreground outline-none focus:border-muted-foreground/50 transition-colors dark:bg-zinc-900 dark:border-zinc-800 dark:text-white"
+                  disabled={loading}
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">
+                  Min Employee Count
+                </label>
+                <input
+                  type="number"
+                  value={minEmployees}
+                  onChange={(e) => setMinEmployees(e.target.value === "" ? "" : Number(e.target.value))}
+                  placeholder="e.g. 5"
+                  className="w-full px-4 py-2.5 bg-card border border-border rounded-xl text-sm text-foreground placeholder-muted-foreground outline-none focus:border-muted-foreground/50 transition-colors dark:bg-zinc-900 dark:border-zinc-800 dark:text-white"
+                  disabled={loading}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">
+                  Min Years in Business
+                </label>
+                <input
+                  type="number"
+                  value={minTimeInBusiness}
+                  onChange={(e) => setMinTimeInBusiness(e.target.value === "" ? "" : Number(e.target.value))}
+                  placeholder="e.g. 3"
+                  className="w-full px-4 py-2.5 bg-card border border-border rounded-xl text-sm text-foreground placeholder-muted-foreground outline-none focus:border-muted-foreground/50 transition-colors dark:bg-zinc-900 dark:border-zinc-800 dark:text-white"
+                  disabled={loading}
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">
+                Max Client Concentration Tolerance
+              </label>
+              <input
+                type="text"
+                value={clientConcentration}
+                onChange={(e) => setClientConcentration(e.target.value)}
+                placeholder="e.g. Under 15% for single customer"
+                className="w-full px-4 py-2.5 bg-card border border-border rounded-xl text-sm text-foreground placeholder-muted-foreground outline-none focus:border-muted-foreground/50 transition-colors dark:bg-zinc-900 dark:border-zinc-800 dark:text-white"
+                disabled={loading}
+              />
             </div>
           </div>
 
@@ -395,6 +523,19 @@ export function BuyerForm({
                   ))}
                 </select>
               </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">
+                Detail Professional/M&A Experience
+              </label>
+              <textarea
+                value={experienceDetail}
+                onChange={(e) => setExperienceDetail(e.target.value)}
+                placeholder="e.g. 15 years in software engineering management. Looking for first manufacturing acquisition with BDC financing pre-approved..."
+                className="w-full h-24 px-4 py-3 bg-card border border-border rounded-xl text-sm text-foreground placeholder-muted-foreground outline-none focus:border-muted-foreground/50 transition-colors resize-none dark:bg-zinc-900 dark:border-zinc-800 dark:text-white"
+                disabled={loading}
+              />
             </div>
           </div>
         </div>

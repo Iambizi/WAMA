@@ -72,6 +72,9 @@ export const create = mutation({
       v.literal("cash"),
       v.literal("financed"),
       v.literal("mixed"),
+      v.literal("vtb"),
+      v.literal("mezzanine"),
+      v.literal("equity_partner"),
       v.literal("unknown")
     ),
     acquisitionExperience: v.union(
@@ -85,6 +88,14 @@ export const create = mutation({
       v.literal("12_24mo"),
       v.literal("24mo_plus")
     ),
+    experienceDetail: v.optional(v.string()),
+    downPaymentAmount: v.optional(v.number()),
+    sourceOfFunds: v.optional(v.string()),
+    targetBusinessValue: v.optional(v.number()),
+    minEbitda: v.optional(v.number()),
+    minEmployees: v.optional(v.number()),
+    minTimeInBusiness: v.optional(v.number()),
+    clientConcentration: v.optional(v.string()),
     proofOfFundsReviewed: v.boolean(),
     ndaSigned: v.boolean(),
     backgroundCheckComplete: v.boolean(),
@@ -153,6 +164,9 @@ export const update = mutation({
       v.literal("cash"),
       v.literal("financed"),
       v.literal("mixed"),
+      v.literal("vtb"),
+      v.literal("mezzanine"),
+      v.literal("equity_partner"),
       v.literal("unknown")
     ),
     acquisitionExperience: v.union(
@@ -166,6 +180,14 @@ export const update = mutation({
       v.literal("12_24mo"),
       v.literal("24mo_plus")
     ),
+    experienceDetail: v.optional(v.string()),
+    downPaymentAmount: v.optional(v.number()),
+    sourceOfFunds: v.optional(v.string()),
+    targetBusinessValue: v.optional(v.number()),
+    minEbitda: v.optional(v.number()),
+    minEmployees: v.optional(v.number()),
+    minTimeInBusiness: v.optional(v.number()),
+    clientConcentration: v.optional(v.string()),
     proofOfFundsReviewed: v.boolean(),
     ndaSigned: v.boolean(),
     backgroundCheckComplete: v.boolean(),

@@ -49,12 +49,22 @@ const PIPELINE_STAGES = [
   { value: "closed_won", label: "Closed — Won", color: "from-emerald-600 to-teal-500" }
 ] as const;
 
+function formatCAD(amount: number) {
+  return new Intl.NumberFormat("en-CA", {
+    style: "currency",
+    currency: "CAD",
+    maximumFractionDigits: 0,
+  }).format(amount);
+}
+
 export default function MatchDetail() {
   const params = useParams();
   const id = params.id as string;
 
   // Local state for advisor notes and UI loading animations
   const [advisorNotes, setAdvisorNotes] = useState<string | null>(null);
+  const [dealValue, setDealValue] = useState<number | "">("");
+  const [targetCloseDate, setTargetCloseDate] = useState<string>("");
   const [savingNotes, setSavingNotes] = useState(false);
   const [updatingStatus, setUpdatingStatus] = useState(false);
   const [statusMessage, setStatusMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
@@ -68,6 +78,8 @@ export default function MatchDetail() {
   // Sync database notes to local text area state when loaded
   if (advisorNotes === null && match !== undefined && match !== null) {
     setAdvisorNotes(match.advisorNotes || "");
+    setDealValue(match.dealValue !== undefined ? match.dealValue : "");
+    setTargetCloseDate(match.targetCloseDate ? new Date(match.targetCloseDate).toISOString().split("T")[0] : "");
   }
 
   if (match === undefined) {
@@ -131,9 +143,11 @@ export default function MatchDetail() {
       await updateMatchStatus({
         id: match._id,
         status: match.status,
-        advisorNotes: advisorNotes || ""
+        advisorNotes: advisorNotes || "",
+        dealValue: dealValue !== "" ? Number(dealValue) : undefined,
+        targetCloseDate: targetCloseDate ? new Date(targetCloseDate + "T00:00:00").getTime() : undefined
       });
-      setStatusMessage({ type: "success", text: "Confidential remarks saved successfully." });
+      setStatusMessage({ type: "success", text: "Confidential remarks and deal parameters saved successfully." });
     } catch (err) {
       console.error("Failed to save remarks:", err);
       setStatusMessage({ type: "error", text: "An error occurred while saving advisor notes." });
@@ -297,6 +311,29 @@ export default function MatchDetail() {
             <p className="text-[10px] text-muted-foreground leading-relaxed max-w-[200px] pt-1">
               Calculated dynamically on de-identified acquisition criteria and mandating constraints.
             </p>
+            {(match.dealValue !== undefined || match.targetCloseDate !== undefined) && (
+              <div className="w-full pt-4 border-t border-border mt-2 space-y-2 text-left">
+                <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider block">
+                  Active Deal Parameters
+                </span>
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  {match.dealValue !== undefined && (
+                    <div className="bg-muted/30 border border-border p-2 rounded-xl">
+                      <span className="text-[9px] text-muted-foreground block">Projected Value</span>
+                      <span className="font-bold text-foreground">{formatCAD(match.dealValue)}</span>
+                    </div>
+                  )}
+                  {match.targetCloseDate !== undefined && (
+                    <div className="bg-muted/30 border border-border p-2 rounded-xl">
+                      <span className="text-[9px] text-muted-foreground block">Target Close</span>
+                      <span className="font-bold text-foreground">
+                        {new Date(match.targetCloseDate).toLocaleDateString("en-CA")}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
@@ -633,13 +670,44 @@ export default function MatchDetail() {
         </div>
 
         <div className="space-y-4">
-          <textarea
-            value={advisorNotes ?? ""}
-            onChange={(e) => setAdvisorNotes(e.target.value)}
-            placeholder="Record transaction negotiation remarks, buyer responses, NDA updates, and upcoming calendar meetings specific to this deal matchup..."
-            rows={5}
-            className="w-full p-4 bg-muted/20 focus:bg-muted/40 border border-border focus:border-muted-foreground/30 rounded-xl text-xs text-foreground placeholder-muted-foreground/50 outline-none transition-all duration-300 resize-none"
-          />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
+                Projected Deal Value (CAD)
+              </label>
+              <input
+                type="number"
+                value={dealValue}
+                onChange={(e) => setDealValue(e.target.value === "" ? "" : Number(e.target.value))}
+                placeholder="e.g. 2500000"
+                className="w-full px-4 py-2 bg-muted/20 focus:bg-muted/40 border border-border focus:border-muted-foreground/30 rounded-xl text-xs text-foreground placeholder-muted-foreground/50 outline-none transition-all duration-300"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
+                Target Close Date
+              </label>
+              <input
+                type="date"
+                value={targetCloseDate}
+                onChange={(e) => setTargetCloseDate(e.target.value)}
+                className="w-full px-4 py-2 bg-muted/20 focus:bg-muted/40 border border-border focus:border-muted-foreground/30 rounded-xl text-xs text-foreground outline-none transition-all duration-300"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
+              Advisor Deal Logs & Notes
+            </label>
+            <textarea
+              value={advisorNotes ?? ""}
+              onChange={(e) => setAdvisorNotes(e.target.value)}
+              placeholder="Record transaction negotiation remarks, buyer responses, NDA updates, and upcoming calendar meetings specific to this deal matchup..."
+              rows={5}
+              className="w-full p-4 bg-muted/20 focus:bg-muted/40 border border-border focus:border-muted-foreground/30 rounded-xl text-xs text-foreground placeholder-muted-foreground/50 outline-none transition-all duration-300 resize-none"
+            />
+          </div>
           
           <div className="flex items-center justify-between gap-4">
             <p className="text-[10px] text-muted-foreground leading-relaxed max-w-xl">

@@ -385,7 +385,7 @@ export default function SellerProfile() {
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-[11px] font-bold text-muted-foreground">
-                  {COPY.sellers.readinessChecklist.scoreLabel}
+                  Document Readiness Score
                 </span>
                 <span className="text-sm font-extrabold text-foreground">
                   {readinessScore}%
@@ -405,31 +405,83 @@ export default function SellerProfile() {
               </div>
             </div>
 
-            {/* Itemized List Checkboxes */}
+            {/* Deal Readiness Checklist */}
             <div className="space-y-3 pt-4 border-t border-border">
               <div className="flex items-center justify-between text-xs text-foreground">
-                <span className="font-semibold text-muted-foreground uppercase tracking-wider text-[10px]">Mandate Document List</span>
-                <span>{readinessScore / 20}/5 Checked</span>
+                <span className="font-semibold text-muted-foreground uppercase tracking-wider text-[10px]">Deal Readiness Tracker</span>
+                <span>
+                  {[
+                    seller.dealDiscoveryMeeting,
+                    seller.dealNdaSigned,
+                    seller.dealDocumentsReceived,
+                    seller.dealPreliminaryAnalysisDone,
+                    seller.dealMandateProposal,
+                    seller.dealProposalSigned,
+                    seller.dealDocumentationReady
+                  ].filter(Boolean).length}/7 Done
+                </span>
               </div>
               
-              <div className="space-y-2.5">
+              <div className="grid grid-cols-1 gap-1.5 max-h-48 overflow-y-auto pr-1">
                 {[
-                  { label: COPY.sellers.readinessChecklist.financialStatements, checked: seller.financialStatementsAvailable },
-                  { label: COPY.sellers.readinessChecklist.taxReturns, checked: seller.taxReturnsAvailable },
-                  { label: COPY.sellers.readinessChecklist.leaseDocuments, checked: seller.leaseDocumentsAvailable },
-                  { label: COPY.sellers.readinessChecklist.corporateDocuments, checked: seller.corporateDocumentsAvailable },
-                  { label: COPY.sellers.readinessChecklist.ndaSigned, checked: seller.ndaSigned },
+                  { label: "Discovery Meeting", checked: seller.dealDiscoveryMeeting },
+                  { label: "NDA Signed", checked: seller.dealNdaSigned },
+                  { label: "Documents Received", checked: seller.dealDocumentsReceived },
+                  { label: "Preliminary Analysis Done", checked: seller.dealPreliminaryAnalysisDone },
+                  { label: "Mandate Proposal Sent", checked: seller.dealMandateProposal },
+                  { label: "Mandate Agreement Signed", checked: seller.dealProposalSigned },
+                  { label: "Marketing Docs Ready (teaser/CIM/data room)", checked: seller.dealDocumentationReady },
                 ].map((item, idx) => (
                   <div 
                     key={idx} 
-                    className={`flex items-center justify-between px-3 py-2 rounded-xl border text-[11px] font-semibold transition-all duration-300 ${
+                    className={`flex items-center justify-between px-3 py-1.5 rounded-xl border text-[11px] font-semibold transition-all duration-300 ${
                       item.checked 
                         ? "bg-emerald-500/5 border-emerald-500/20 text-emerald-600 dark:text-emerald-400" 
                         : "bg-muted/10 border-border text-muted-foreground"
                     }`}
                   >
                     <span>{item.label}</span>
-                    {item.checked ? <CheckCircle2 className="h-4 w-4 shrink-0" /> : <XCircle className="h-4 w-4 shrink-0" />}
+                    {item.checked ? <CheckCircle2 className="h-3.5 w-3.5 shrink-0" /> : <XCircle className="h-3.5 w-3.5 shrink-0 text-muted-foreground/50" />}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Document Checklist */}
+            <div className="space-y-3 pt-4 border-t border-border">
+              <div className="flex items-center justify-between text-xs text-foreground">
+                <span className="font-semibold text-muted-foreground uppercase tracking-wider text-[10px]">Document Checklist</span>
+                <span>
+                  {[
+                    seller.docFinancialsCpa,
+                    seller.docFinancialsInterim,
+                    seller.docAccountsReceivable,
+                    seller.docAccountsPayable,
+                    seller.docEmployeeOrgChart,
+                    seller.docExecutiveSalaries
+                  ].filter(Boolean).length}/6 Checked
+                </span>
+              </div>
+              
+              <div className="grid grid-cols-1 gap-1.5 max-h-48 overflow-y-auto pr-1">
+                {[
+                  { label: "CPA-signed Financials (last 5 years)", checked: seller.docFinancialsCpa },
+                  { label: "Interim Financials (current year)", checked: seller.docFinancialsInterim },
+                  { label: "Detailed Accounts Receivable (A/R)", checked: seller.docAccountsReceivable },
+                  { label: "Detailed Accounts Payable (A/P)", checked: seller.docAccountsPayable },
+                  { label: "Employee Org Chart", checked: seller.docEmployeeOrgChart },
+                  { label: "Executive & Employee Salaries", checked: seller.docExecutiveSalaries },
+                ].map((item, idx) => (
+                  <div 
+                    key={idx} 
+                    className={`flex items-center justify-between px-3 py-1.5 rounded-xl border text-[11px] font-semibold transition-all duration-300 ${
+                      item.checked 
+                        ? "bg-emerald-500/5 border-emerald-500/20 text-emerald-600 dark:text-emerald-400" 
+                        : "bg-muted/10 border-border text-muted-foreground"
+                    }`}
+                  >
+                    <span>{item.label}</span>
+                    {item.checked ? <CheckCircle2 className="h-3.5 w-3.5 shrink-0" /> : <XCircle className="h-3.5 w-3.5 shrink-0 text-muted-foreground/50" />}
                   </div>
                 ))}
               </div>
@@ -472,20 +524,20 @@ export default function SellerProfile() {
             className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 transition-opacity duration-300"
           />
           {/* Sheet */}
-          <div className="fixed right-0 top-0 bottom-0 w-full max-w-3xl bg-zinc-950 border-l border-zinc-900 shadow-2xl p-8 overflow-y-auto z-50 transform transition-transform duration-300 animate-in slide-in-from-right">
-            <div className="flex items-center justify-between border-b border-zinc-900 pb-4 mb-8">
+          <div className="fixed right-0 top-0 bottom-0 w-full max-w-3xl bg-card border-l border-border shadow-2xl p-8 overflow-y-auto z-50 transform transition-transform duration-300 animate-in slide-in-from-right text-foreground">
+            <div className="flex items-center justify-between border-b border-border pb-4 mb-8">
               <div className="space-y-1">
-                <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                <h3 className="text-lg font-bold text-foreground flex items-center gap-2">
                   <Edit className="h-5 w-5 text-amber-500" />
                   <span>Edit Seller Criteria</span>
                 </h3>
-                <p className="text-[11px] text-zinc-400">
+                <p className="text-[11px] text-muted-foreground">
                   Update active sell-side mandate details and document checklist readiness.
                 </p>
               </div>
               <button 
                 onClick={() => setIsEditing(false)}
-                className="p-2 bg-zinc-900 hover:bg-zinc-800 rounded-xl text-zinc-400 hover:text-zinc-200 transition-colors text-xs font-semibold"
+                className="p-2 bg-muted hover:bg-muted/80 rounded-xl text-muted-foreground hover:text-foreground transition-colors text-xs font-semibold"
               >
                 Close
               </button>
@@ -505,11 +557,19 @@ export default function SellerProfile() {
                 yearsInOperation: seller.yearsInOperation,
                 transactionType: seller.transactionType,
                 reasonForSale: seller.reasonForSale,
-                financialStatementsAvailable: seller.financialStatementsAvailable,
-                taxReturnsAvailable: seller.taxReturnsAvailable,
-                leaseDocumentsAvailable: seller.leaseDocumentsAvailable,
-                corporateDocumentsAvailable: seller.corporateDocumentsAvailable,
-                ndaSigned: seller.ndaSigned,
+                dealDiscoveryMeeting: seller.dealDiscoveryMeeting || false,
+                dealNdaSigned: seller.dealNdaSigned || false,
+                dealDocumentsReceived: seller.dealDocumentsReceived || false,
+                dealPreliminaryAnalysisDone: seller.dealPreliminaryAnalysisDone || false,
+                dealMandateProposal: seller.dealMandateProposal || false,
+                dealProposalSigned: seller.dealProposalSigned || false,
+                dealDocumentationReady: seller.dealDocumentationReady || false,
+                docFinancialsCpa: seller.docFinancialsCpa || false,
+                docFinancialsInterim: seller.docFinancialsInterim || false,
+                docAccountsReceivable: seller.docAccountsReceivable || false,
+                docAccountsPayable: seller.docAccountsPayable || false,
+                docEmployeeOrgChart: seller.docEmployeeOrgChart || false,
+                docExecutiveSalaries: seller.docExecutiveSalaries || false,
                 notes: seller.notes,
               }}
               onSubmit={handleEditSubmit}
