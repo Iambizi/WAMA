@@ -170,7 +170,7 @@ Return the top matches ranked by score descending. Include all buyers with a sco
         apiKey: apiKey,
       });
 
-      model = anthropicProvider(rawModelName || "claude-sonnet-4-6");
+      model = anthropicProvider(rawModelName || "claude-3-5-sonnet-latest");
     }
 
     // Execute de-identified matching using the Vercel AI SDK generateObject

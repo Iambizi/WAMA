@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode } from "react";
+import { ReactNode, useState, useEffect } from "react";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useAuth, SignIn } from "@clerk/nextjs";
@@ -9,6 +9,19 @@ import { Sidebar } from "@/components/layout/sidebar";
 export default function AdminLayout({ children }: { children: ReactNode }) {
   const { isLoaded, isSignedIn } = useAuth();
   const currentUser = useQuery(api.users.current);
+  const [isSyncDelay, setIsSyncDelay] = useState(true);
+
+  useEffect(() => {
+    if (currentUser === null) {
+      // If user isn't found in Convex yet, wait up to 1200ms to allow the sync mutation to complete
+      const timer = setTimeout(() => {
+        setIsSyncDelay(false);
+      }, 1200);
+      return () => clearTimeout(timer);
+    } else if (currentUser) {
+      setIsSyncDelay(false);
+    }
+  }, [currentUser]);
 
   if (!isLoaded) {
     return (
@@ -26,8 +39,8 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
     );
   }
 
-  // Wait for the Convex sync query to resolve
-  if (currentUser === undefined) {
+  // Wait for the Convex sync query to resolve or the sync delay to complete
+  if (currentUser === undefined || (currentUser === null && isSyncDelay)) {
     return (
       <div className="flex min-h-screen w-screen items-center justify-center bg-background p-4">
         <div className="text-muted-foreground animate-pulse">Authorizing credentials...</div>
