@@ -28,6 +28,28 @@
 
 ---
 
+## Session 16 — 2026-07-15
+**Agent:** Antigravity
+**Step:** Step 9 — Bug Fixes & William French Briefing
+**Status:** ✅ Complete
+
+### What Was Done
+- **Converted William Briefing to French (Tutoiement)**: Rewrote `docs/internal/william-orientation-briefing.md` in friendly, informal French to align with their relationship and enable copy-pasting for an email.
+- **Fixed AI Matching Model Identifier Bug**: Corrected invalid model name `claude-sonnet-4-6` in `app/api/match/route.ts` to `claude-3-5-sonnet-latest`, resolving the matching engine route failure.
+- **Resolved "Access Denied" Layout Flash Race Condition**: Added a 1.2-second wait delay state when `currentUser === null` on `app/(admin)/layout.tsx` to give Convex's first-time Clerk login sync mutation sufficient time to execute without flashing unauthorized screens to admins.
+- **Verified Build safety**: Successfully ran production compiling and pushed to GitHub main branch.
+
+### Decisions Made
+- Used a temporary client-side loading delay for missing Convex users during authentication rather than blocking Clerk's frontend or leaking sensitive admin env details.
+
+### Open Questions / Blockers
+- None.
+
+### Next Steps
+- Validate Vercel production site functionality once the latest commit build completes.
+
+---
+
 ## Session 15 — 2026-07-07
 **Agent:** Antigravity
 **Step:** Step 8 — M&A Advisor Feedback & Form Styling
