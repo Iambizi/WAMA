@@ -16,7 +16,7 @@ Voici l'essentiel en 3 points rapides :
    * **Critères acheteurs avancés :** Prise en compte de leur mise de fonds, EBITDA minimum recherché, nombre d'employés requis, et modes de financement (comme la balance de prix de vente, dette mezzanine, etc.).
 
 2. **La sécurité de tes données (en termes clairs) :**
-   * **Base de données privée :** Tout ce que tu écris est stocké sur un serveur hautement sécurisé et chiffré. Seul toi (avec ton accès admin) peux voir ces informations. Un acheteur ou un vendeur externe ne pourra jamais fouiller dans tes dossiers.
+   * **Base de données privée :** Tout ce que tu écris est stocké sur un serveur tiers hautement sécurisé et chiffré qui s'appelle Convex. Je l'utilise pour tous mes projets, je pourrai te montrer à quoi ça ressemble. Seul toi ou moi (avec un accès admin) pouvons voir ces informations. Un acheteur ou un vendeur externe ne pourra jamais fouiller dans tes dossiers.
    * **L'IA est anonymisée :** Quand tu cliques sur le bouton de matching, l'IA (Claude) n'analyse que des critères anonymes (secteurs, chiffres, régions). Le système retire automatiquement les noms de tes clients, leurs emails, et le nom réel des entreprises avant d'envoyer la requête. L'IA n'apprend rien sur tes clients et ne conserve rien.
 
 3. **Activation de l'IA (Important) :**
