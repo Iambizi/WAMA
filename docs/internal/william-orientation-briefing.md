@@ -1,66 +1,58 @@
-# WAMA Platform Ready: Security, Data Privacy & AI Safeguards
+Subject: WAMA Platform Ready: Feature Updates & Client Data Security Overview
 
-This briefing has been prepared to outline the readiness of the WAMA platform and address all privacy and data residency questions regarding sensitive client records and deal information.
+Hi William,
 
-With the latest updates, **the WAMA platform is fully configured and ready for production use.** William can begin inputting actual buyer profiles, seller mandates, and tracking active matches.
+I am pleased to let you know that the WAMA platform is now fully updated and ready for production use. Following our recent meeting, we have implemented all your feedback regarding deal tracking, document checklists, and expanded criteria. 
 
----
+I understand that inputting sensitive client information can be a point of concern, so I wanted to provide a clear explanation of how the platform is structured to protect your business records and ensure absolute client confidentiality.
 
-## 1. System Readiness: Key Features Enabled
-* **Deal Readiness Tracker:** A pipeline progression checklist directly tracking target milestones:
-  * Discovery Meeting $\rightarrow$ NDA Signed $\rightarrow$ Documents Received $\rightarrow$ Preliminary Analysis $\rightarrow$ Mandate Proposal Sent $\rightarrow$ Mandate Signed $\rightarrow$ Marketing Docs Ready.
-* **Document Checklist & Score:** Standard CPA-signed financials (last 5 years), interim current-year statements, A/R & A/P lists, employee org charts, and salary detail indicators are tracked to compile exit preparedness.
-* **Confidential Deal Parameters:** Projected Deal Value ($) and Target Close Dates can be logged and edited dynamically on each matchup.
-* **M&A Specific Capital Criteria:** Expansion of buyer budget metrics to support Down Payment amounts, Source of Funds, Min EBITDA requirements, Min Employees, Min Operational Years, Client Concentration tolerances, and specific M&A financing structures (e.g., Vendor Take-Back / Balance of Sale, Mezzanine debt, Equity partners).
+Here is a summary of what has been built and how your data is protected.
 
 ---
 
-## 2. Reassurance: How Client Information is Safeguarded
+### 1. New Features & Updates Now Active
 
-William’s boutique M&A client records are protected by multiple, overlapping layers of technical security and architecture guardrails:
-
-### Data Storage Security (Convex Database)
-> [!IMPORTANT]
-> All client records are stored in a private, high-performance database instance hosted by Convex. 
-> * **Encryption at Rest:** All tables are encrypted using AES-256.
-> * **Encryption in Transit:** All traffic is encrypted using TLS 1.3, preventing interception.
-> * **Advisor Role Restrictions:** Access to the administration panel is restricted strictly to authorized user sessions verified by **Clerk Enterprise Authentication**. Buyers and Sellers cannot see each other's details or browse directories.
+*   **Deal Readiness Tracker:** You can now track the lifecycle of a mandate through its key administrative phases:
+    *   *Discovery Meeting $\rightarrow$ NDA Signed $\rightarrow$ Documents Received $\rightarrow$ Preliminary Analysis $\rightarrow$ Mandate Proposal Sent $\rightarrow$ Mandate Signed $\rightarrow$ Marketing Files Ready (Teaser, CIM, Data Room).*
+*   **Detailed Document Checklists:** We upgraded the exit readiness indicators. You can now check off specific files (CPA-signed financials for the last 5 years, interim current-year statements, detailed accounts receivable/payable lists, employee org charts, and salary detail logs). The platform automatically calculates an exit readiness score based on these documents.
+*   **Custom Deal Parameters:** When you match a buyer and seller, you can log custom metrics directly on that specific match card—specifically, **Projected Deal Value ($)** and a **Target Close Date**—alongside your advisor notes.
+*   **Expanded Buyer Criteria:** We added several M&A-specific fields for qualifying buyers. You can now capture their down payment amount, source of funds, target business size, minimum desired EBITDA, minimum employees, minimum years operational, and client concentration tolerance. 
+*   **Financing Type Dropdown:** Updated to include structures like Vendor Take-Back / Balance of Sale (BPV), Mezzanine debt, and Equity/Financial partners.
 
 ---
 
-## 3. Strict AI Privacy Guardrails (Claude Prompt Sandboxing)
+### 2. How Client Information is Safeguarded
 
-When WAMA executes AI-assisted matching, **no Personally Identifiable Information (PII) is ever exposed.** 
+We have built WAMA with a "security-first" architecture to ensure that your proprietary client relationships, contacts, and deal files remain completely private.
 
-The system implements a **Strict Allowlist Data Mapper** that intercepts data before it is processed.
+#### A. Highly Secure Database Storage
+All information you enter is stored in a private cloud database managed by Convex. 
+*   **Encryption at Rest:** All data is encrypted using standard AES-256 protocols.
+*   **Encryption in Transit:** All traffic between your browser and the database is secured via TLS 1.3 (preventing any interception).
+*   **Advisor-Only Access:** Access to the administration portal is restricted strictly to verified administrator accounts via Clerk Secure Authentication. Outside users (buyers and sellers) can only see their own individual profiles and cannot browse your database or see other companies.
 
-```mermaid
-graph TD
-    A["Raw Client Record (Name, Email, Notes, Company Name)"] --> B{"Allowlist Filter"}
-    B -->|PII / Notes / Contact Details| C["Locked in Database (Secure Encryption)"]
-    B -->|De-Identified Criteria Only| D["Sanitized Payload Mapper"]
-    D --> E["AI Match Engine (Claude/OpenAI API)"]
-    C -.-> F["Advisor Dashboard (Visible to William Only)"]
-```
+#### B. Strict AI Anonymization (No PII Sent to AI)
+WAMA uses artificial intelligence (Claude) to analyze criteria and suggest matches. However, **your clients' identifying details never reach the AI.**
+*   **Automated Masking:** Before the matching system runs, it strips all real names, emails, phone numbers, exact company names, and advisor notes. 
+*   **Randomized References:** The AI only sees randomized 6-character reference codes (for example, *Projet Boulangerie* is renamed to *Confidential Project Ref: b7d3d0*).
+*   **De-identified Criteria Only:** The AI only evaluates non-identifying parameters: industry sector, general region (e.g., Greater Montreal), revenue/EBITDA brackets, employee counts, and the advisor-written, de-identified description of the transaction.
+*   **Zero Data Retention:** We access the AI models through secure enterprise APIs. Under these service terms, the AI providers are legally prohibited from retaining your data or using it to train their public models.
 
-### De-Identification Protocols
-* **Pseudonymized References:** Before transmitting data to the AI model, the system strips the seller's business name and the buyer's real name. They are replaced by randomized 6-character hexadecimal codes (e.g., `Projet Boulangerie` $\rightarrow$ `Confidential Project Ref: b7d3d0`).
-* **Content Sandboxing:**
-  * **Direct Details & Notes:** Phone numbers, emails, and William's confidential deal notes **never** leave the database.
-  * **Allowed Prompt Fields:** The matching engine is only sent de-identified criteria (e.g., target industry, revenue brackets, employee count, geographic region, and the advisor-written, de-identified sale description).
-* **Enterprise API Policies:** WAMA accesses LLM models (Anthropic Claude / OpenAI GPT) through enterprise API endpoints. Under these service agreements, **zero data is retained** by the providers, and **no user data is ever used to train public LLM models.**
+#### C. Data Access Matrix
 
----
-
-## 4. Summary Table: Data Access Matrix
-
-| Client Data Field | Visible to William | Visible to AI Matching Engine | Visible to Portal Users (Buyers/Sellers) |
+| Client Information Field | Visible to William | Evaluated by AI Matching Engine | Visible to Portal Users (Buyers/Sellers) |
 | :--- | :---: | :---: | :---: |
-| **Owner Names / Contacts** | Yes | **No (Strips PII)** | **No** |
-| **Internal Business Name** | Yes | **No (Strips PII)** | **No (Displays "Confidential Project")** |
-| **Advisor Confidential Remarks**| Yes | **No** | **No** |
-| **Financial Ranges (Rev/EBITDA)**| Yes | Yes | Yes (Range brackets only) |
-| **Checklist Completion Status** | Yes | Yes (Calculates Fit Strength) | Yes (Only own dashboard) |
-| **Projected Deal Value / Close Date**| Yes | **No** | **No** |
+| **Owner Names & Contacts** | **Yes** | **No** | **No** |
+| **Internal Business Name** | **Yes** | **No** | **No (Displays "Confidential Project")** |
+| **Advisor Confidential Remarks** | **Yes** | **No** | **No** |
+| **Financial Ranges (Revenue/EBITDA)** | **Yes** | **Yes** (Range brackets only) | **Yes** (Only to approved matches) |
+| **Checklist Completion Status** | **Yes** | **Yes** (Calculates fit score) | **Yes** (Only their own checklists) |
+| **Projected Deal Value / Close Date** | **Yes** | **No** | **No** |
 
-William can rest assured that he is operating a **fully private, secure advisory workspace** where client confidentiality is protected at both the database level and the AI processing boundary.
+---
+
+With these updates and protections in place, the environment is fully secure and ready for you to begin inputting your client records and managing your deals. 
+
+Please let me know if you would like a brief walkthrough of the new screens, or if you have any questions about the security protocols.
+
+Best regards,
