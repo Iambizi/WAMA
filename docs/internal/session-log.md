@@ -28,6 +28,24 @@
 
 ---
 
+## Session 17 — 2026-07-18
+**Agent:** Antigravity
+**Step:** Step 10 — Security Verification & Audit Review
+**Status:** ✅ Complete
+
+### What Was Done
+- **Verified Security and Remediation Docs**: Reviewed `security-remediation.md`, `william-orientation-briefing.md`, and `advisor-security-guide.md` to ensure complete accuracy against current database schema, validations, and rates.
+- **Corrected Security Guide**: Updated `docs/internal/advisor-security-guide.md` to show that the system uses random UUID references rather than a "6-character reference code" when sending de-identified profiles to the AI matching engine.
+- **Committed and Pushed changes**: Committed all unstaged files and pushed them to the remote git origin.
+
+### Decisions Made
+- Updated the documentation to accurately reflect UUID references to prevent mismatch during security reviews.
+
+### Next Steps
+- Share onboarding documents with William and proceed with meeting.
+
+---
+
 ## Session 16 — 2026-07-15
 **Agent:** Antigravity
 **Step:** Step 9 — Bug Fixes & William French Briefing
