@@ -23,7 +23,7 @@ If William expresses concern about inputting sensitive company names, contacts, 
 *   **The Worry:** A leak of seller identities can cause panic among employees, customers, and suppliers, damaging the business valuation.
 *   **The Answer:** WAMA enforces **De-identification by Default**.
     *   Before sending any profile to the matching engine, the system strips the business name, owner name, email, and phone number.
-    *   It replaces them with a random 6-character reference code (e.g., *Projet Boulangerie* becomes *Project Ref: b7d3d0*).
+    *   It replaces them with a unique random reference string (e.g., *Projet Boulangerie* becomes a random UUID reference like *seller_f48d39e...*).
     *   The only details processed are high-level statistics (e.g., "Food & Beverage sector, Greater Montreal, 6-15 employees, $1M-$3M CAD revenue range").
 
 ### Concern C: "Can potential buyers or sellers browse my other database files?"

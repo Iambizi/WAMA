@@ -9,7 +9,7 @@ import { Landmark } from "lucide-react";
 
 export default function SellerIntake() {
   const router = useRouter();
-  const createSeller = useMutation(api.sellers.create);
+  const createSeller = useMutation(api.sellers.createSelf);
   const updateIntent = useMutation(api.users.updateIntent);
   const currentSellerProfile = useQuery(api.sellers.currentSeller);
 
@@ -27,7 +27,19 @@ export default function SellerIntake() {
 
   const handleSubmit = async (values: SellerFormValues) => {
     try {
-      await createSeller(values);
+      const {
+        dealDiscoveryMeeting: _dealDiscovery, dealNdaSigned: _dealNda,
+        dealDocumentsReceived: _dealDocs, dealPreliminaryAnalysisDone: _analysis,
+        dealMandateProposal: _proposal, dealProposalSigned: _signed,
+        dealDocumentationReady: _ready, docFinancialsCpa: _cpa,
+        docFinancialsInterim: _interim, docAccountsReceivable: _ar,
+        docAccountsPayable: _ap, docEmployeeOrgChart: _org,
+        docExecutiveSalaries: _salaries, notes: _notes, ...selfFields
+      } = values;
+      void _dealDiscovery; void _dealNda; void _dealDocs; void _analysis;
+      void _proposal; void _signed; void _ready; void _cpa; void _interim;
+      void _ar; void _ap; void _org; void _salaries; void _notes;
+      await createSeller(selfFields);
       router.push("/seller/dashboard");
     } catch (error) {
       console.error("Failed to submit seller profile:", error);
@@ -59,6 +71,7 @@ export default function SellerIntake() {
           onSubmit={handleSubmit}
           onCancel={() => router.push("/")}
           submitLabel="Submit Intake"
+          selfService
         />
       </div>
     </div>

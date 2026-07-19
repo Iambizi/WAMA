@@ -9,9 +9,14 @@
  */
 
 import type * as activityLogs from "../activityLogs.js";
+import type * as aiSecurity from "../aiSecurity.js";
+import type * as authz from "../authz.js";
 import type * as buyers from "../buyers.js";
 import type * as dashboard from "../dashboard.js";
 import type * as matches from "../matches.js";
+import type * as onboarding from "../onboarding.js";
+import type * as privacyRequests from "../privacyRequests.js";
+import type * as securityValidation from "../securityValidation.js";
 import type * as sellers from "../sellers.js";
 import type * as users from "../users.js";
 
@@ -23,9 +28,14 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   activityLogs: typeof activityLogs;
+  aiSecurity: typeof aiSecurity;
+  authz: typeof authz;
   buyers: typeof buyers;
   dashboard: typeof dashboard;
   matches: typeof matches;
+  onboarding: typeof onboarding;
+  privacyRequests: typeof privacyRequests;
+  securityValidation: typeof securityValidation;
   sellers: typeof sellers;
   users: typeof users;
 }>;

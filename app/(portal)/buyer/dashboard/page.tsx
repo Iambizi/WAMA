@@ -25,7 +25,7 @@ export default function BuyerDashboard() {
         </div>
         <h1 className="text-2xl font-bold tracking-tight mb-2">No Application Found</h1>
         <p className="text-muted-foreground text-sm mb-6">
-          You haven't completed your Buyer Onboarding Application yet. Apply now to target private mandates.
+          You haven&apos;t completed your Buyer Onboarding Application yet. Apply now to target private mandates.
         </p>
         <Link
           href="/buyer/apply"
@@ -57,19 +57,6 @@ export default function BuyerDashboard() {
           icon: <ShieldAlert className="h-4 w-4" />,
           classes: "bg-red-100 text-red-800 dark:bg-red-950/30 dark:text-red-400 border-red-200 dark:border-red-900/50",
         };
-    }
-  };
-
-  const getAccessStatusBadge = (status: "teaser_shared" | "nda_required" | "intro_approved" | "introduced") => {
-    switch (status) {
-      case "teaser_shared":
-        return "bg-zinc-100 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-300";
-      case "nda_required":
-        return "bg-amber-100 text-amber-800 dark:bg-amber-950/30 dark:text-amber-400";
-      case "intro_approved":
-        return "bg-blue-100 text-blue-800 dark:bg-blue-950/30 dark:text-blue-400";
-      case "introduced":
-        return "bg-emerald-100 text-emerald-800 dark:bg-emerald-950/30 dark:text-emerald-400";
     }
   };
 
@@ -182,16 +169,16 @@ export default function BuyerDashboard() {
                   </p>
                 </div>
               ) : (
-                matches.map((m) => (
-                  <div key={m._id} className="p-6 hover:bg-muted/10 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                matches.map((m, index) => (
+                  <div key={`${m.sellerSector}-${m.sellerRevenueRange}-${index}`} className="p-6 hover:bg-muted/10 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div className="space-y-3">
                       <div className="flex items-center gap-2">
                         <span className="font-bold text-sm text-foreground">
                           {m.sellerBusinessName}
                         </span>
-                        {m.buyerAccessStatus && (
-                          <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium capitalize ${getAccessStatusBadge(m.buyerAccessStatus as any)}`}>
-                            {m.buyerAccessStatus.replace("_", " ")}
+                        {m.requiresNda && (
+                          <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-amber-100 text-amber-800 dark:bg-amber-950/30 dark:text-amber-400">
+                            NDA required
                           </span>
                         )}
                       </div>
@@ -212,23 +199,23 @@ export default function BuyerDashboard() {
                         </div>
                         <div>
                           <span className="font-semibold text-foreground/80 block">EBITDA</span>
-                          <span className="capitalize">{m.sellerEbitdaRange.replace("_", " ")}</span>
+                          <span className="capitalize">{"sellerEbitdaRange" in m ? m.sellerEbitdaRange.replace("_", " ") : "Available after approval"}</span>
                         </div>
                       </div>
                     </div>
 
                     <div>
-                      {m.buyerAccessStatus === "nda_required" ? (
+                      {m.requiresNda ? (
                         <button className="inline-flex w-full sm:w-auto items-center justify-center gap-1.5 rounded-lg bg-amber-500 hover:bg-amber-600 text-white text-xs font-semibold px-4 py-2 shadow-sm transition-all cursor-pointer">
                           <FileText className="h-3.5 w-3.5" />
                           Sign NDA
                         </button>
-                      ) : (
+                      ) : m.canContactAdvisor ? (
                         <button className="inline-flex w-full sm:w-auto items-center justify-center gap-1.5 rounded-lg bg-primary hover:bg-primary/95 text-primary-foreground text-xs font-semibold px-4 py-2 shadow-sm transition-all cursor-pointer">
                           Contact William
                           <ChevronRight className="h-3.5 w-3.5" />
                         </button>
-                      )}
+                      ) : null}
                     </div>
                   </div>
                 ))

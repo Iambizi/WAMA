@@ -42,13 +42,15 @@ interface BuyerFormProps {
   onSubmit: (values: BuyerFormValues) => Promise<void>;
   onCancel: () => void;
   submitLabel?: string;
+  selfService?: boolean;
 }
 
 export function BuyerForm({ 
   initialValues, 
   onSubmit, 
   onCancel, 
-  submitLabel = COPY.common.save 
+  submitLabel = COPY.common.save,
+  selfService = false,
 }: BuyerFormProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -369,8 +371,7 @@ export function BuyerForm({
             </div>
           </div>
 
-          {/* Section 3: Readiness Checklist */}
-          <div className="space-y-4">
+          {!selfService && <div className="space-y-4">
             <h3 className="text-sm font-bold text-foreground/80 uppercase tracking-wider">
               3. Verification Checklist
             </h3>
@@ -415,7 +416,7 @@ export function BuyerForm({
                 </span>
               </label>
             </div>
-          </div>
+          </div>}
         </div>
 
         {/* RIGHT COLUMN */}
@@ -541,8 +542,7 @@ export function BuyerForm({
         </div>
       </div>
 
-      {/* Section 7: Notes */}
-      <div className="space-y-2 max-w-4xl">
+      {!selfService && <div className="space-y-2 max-w-4xl">
         <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">
           {COPY.buyers.fields.notes}
         </label>
@@ -553,7 +553,7 @@ export function BuyerForm({
           className="w-full h-32 px-4 py-3 bg-card border border-border rounded-xl text-sm text-foreground placeholder-muted-foreground outline-none focus:border-muted-foreground/50 transition-colors resize-none dark:bg-zinc-900 dark:border-zinc-800 dark:text-white dark:placeholder-zinc-500 dark:focus:border-zinc-700"
           disabled={loading}
         />
-      </div>
+      </div>}
 
       {/* Action Buttons */}
       <div className="flex items-center justify-end gap-3 pt-4 border-t border-border max-w-4xl">

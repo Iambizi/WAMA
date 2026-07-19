@@ -3,6 +3,7 @@ import { Inter, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { ConvexClientProvider } from "@/components/providers/convex-client-provider";
+import { connection } from "next/server";
 
 const inter = Inter({
   variable: "--font-sans",
@@ -19,11 +20,14 @@ export const metadata: Metadata = {
   description: "Boutique M&A buy-sell qualification and advisor matching portal.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Strict CSP nonces are generated per request by proxy.ts. Dynamic rendering
+  // lets Next.js attach that nonce to framework and application scripts.
+  await connection();
   return (
     <html
       lang="en"

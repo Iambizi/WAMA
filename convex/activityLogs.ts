@@ -1,37 +1,9 @@
 import { v } from "convex/values";
 import { mutation, query, QueryCtx, MutationCtx } from "./_generated/server";
+import { requireAdvisor } from "./authz";
+import { optionalText, requiredText } from "./securityValidation";
 
-// Helper to enforce auth
-export async function requireAdvisor(ctx: QueryCtx | MutationCtx) {
-  const identity = await ctx.auth.getUserIdentity();
-  if (!identity) {
-    throw new Error("Unauthorized: Identity context missing");
-  }
-
-  // Check if user is registered in the database and has the "admin" role
-  const user = await ctx.db
-    .query("users")
-    .withIndex("by_clerk_id", (q) => q.eq("clerkId", identity.subject))
-    .unique();
-
-  if (user && user.role === "admin") {
-    return identity;
-  }
-
-  // Direct environment allowlist check as a fallback (helpful for first login before syncing)
-  const adminEmailsEnv = process.env.ADMIN_EMAILS || "";
-  const adminEmails = adminEmailsEnv
-    .split(",")
-    .map((email) => email.trim().toLowerCase())
-    .filter(Boolean);
-
-  const userEmail = identity.email?.toLowerCase() || "";
-  if (adminEmails.includes(userEmail)) {
-    return identity;
-  }
-
-  throw new Error("Forbidden: Admin privileges required");
-}
+export { requireAdvisor } from "./authz";
 
 // Query to list the latest 20 activity logs for the dashboard
 export const list = query({
@@ -53,7 +25,10 @@ export const create = mutation({
     entityType: v.union(
       v.literal("buyer"),
       v.literal("seller"),
-      v.literal("match")
+      v.literal("match"),
+      v.literal("user"),
+      v.literal("ai"),
+      v.literal("privacy")
     ),
     entityId: v.string(),
     entityLabel: v.string(),
@@ -63,20 +38,25 @@ export const create = mutation({
     ctx: MutationCtx,
     args: {
       action: string;
-      entityType: "buyer" | "seller" | "match";
+      entityType: "buyer" | "seller" | "match" | "user" | "ai" | "privacy";
       entityId: string;
       entityLabel: string;
       details?: string;
     }
   ) => {
-    await requireAdvisor(ctx);
+    const { identity, user } = await requireAdvisor(ctx);
     const now = Date.now();
     return await ctx.db.insert("activityLogs", {
-      action: args.action,
+      action: requiredText(args.action, "Action", 80),
       entityType: args.entityType,
       entityId: args.entityId,
-      entityLabel: args.entityLabel,
-      details: args.details,
+      entityLabel: `${args.entityType} record`,
+      details: optionalText(args.details, "Log details", 500),
+      actorClerkId: identity.subject,
+      actorUserId: user._id,
+      actorRole: "admin",
+      outcome: "success",
+      source: "ui",
       createdAt: now,
     });
   },

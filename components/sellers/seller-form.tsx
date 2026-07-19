@@ -46,13 +46,15 @@ interface SellerFormProps {
   onSubmit: (values: SellerFormValues) => Promise<void>;
   onCancel: () => void;
   submitLabel?: string;
+  selfService?: boolean;
 }
 
 export function SellerForm({ 
   initialValues, 
   onSubmit, 
   onCancel, 
-  submitLabel = COPY.common.save 
+  submitLabel = COPY.common.save,
+  selfService = false,
 }: SellerFormProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -382,8 +384,7 @@ export function SellerForm({
             </div>
           </div>
 
-          {/* Section 4: Deal Readiness Checklist */}
-          <div className="space-y-4">
+          {!selfService && <div className="space-y-4">
             <h3 className="text-sm font-bold text-foreground/80 uppercase tracking-wider">
               4. Deal Readiness Tracker
             </h3>
@@ -480,10 +481,9 @@ export function SellerForm({
                 </span>
               </label>
             </div>
-          </div>
+          </div>}
 
-          {/* Section 5: Document Readiness Checklist */}
-          <div className="space-y-4">
+          {!selfService && <div className="space-y-4">
             <h3 className="text-sm font-bold text-foreground/80 uppercase tracking-wider">
               5. Mandate Document Checklist (Readiness Score impact)
             </h3>
@@ -567,7 +567,7 @@ export function SellerForm({
                 </span>
               </label>
             </div>
-          </div>
+          </div>}
         </div>
       </div>
 
@@ -589,7 +589,7 @@ export function SellerForm({
           </span>
         </div>
 
-        <div className="space-y-2">
+        {!selfService && <div className="space-y-2">
           <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">
             {COPY.sellers.fields.notes}
           </label>
@@ -600,7 +600,7 @@ export function SellerForm({
             className="w-full h-28 px-4 py-3 bg-card border border-border rounded-xl text-sm text-foreground placeholder-muted-foreground outline-none focus:border-muted-foreground/50 transition-colors resize-none dark:bg-zinc-900 dark:border-zinc-800 dark:text-white dark:placeholder-zinc-500 dark:focus:border-zinc-700"
             disabled={loading}
           />
-        </div>
+        </div>}
       </div>
 
       {/* Action Buttons */}

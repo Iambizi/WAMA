@@ -177,13 +177,52 @@ export default defineSchema({
     entityType: v.union(
       v.literal("buyer"),
       v.literal("seller"),
-      v.literal("match")
+      v.literal("match"),
+      v.literal("user"),
+      v.literal("ai"),
+      v.literal("privacy")
     ),
     entityId: v.string(),
     entityLabel: v.string(),         // Human-readable: "Buyer #14" or buyer name
     details: v.optional(v.string()), // e.g. "status: pending → qualified"
+    actorClerkId: v.optional(v.string()),
+    actorUserId: v.optional(v.id("users")),
+    actorRole: v.optional(v.union(v.literal("admin"), v.literal("buyer"), v.literal("seller"), v.literal("unassigned"), v.literal("system"))),
+    outcome: v.optional(v.union(v.literal("success"), v.literal("failure"))),
+    source: v.optional(v.union(v.literal("ui"), v.literal("api"), v.literal("migration"), v.literal("system"))),
+    correlationId: v.optional(v.string()),
     createdAt: v.number(),
   }).index("by_created_at", ["createdAt"]),
+
+  aiRequests: defineTable({
+    requestId: v.string(),
+    fingerprint: v.string(),
+    sellerId: v.id("sellers"),
+    actorUserId: v.id("users"),
+    status: v.union(v.literal("running"), v.literal("completed"), v.literal("failed")),
+    candidateCount: v.optional(v.number()),
+    provider: v.optional(v.string()),
+    model: v.optional(v.string()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+    expiresAt: v.number(),
+  })
+    .index("by_request_id", ["requestId"])
+    .index("by_actor", ["actorUserId"])
+    .index("by_seller", ["sellerId"])
+    .index("by_fingerprint", ["fingerprint"]),
+
+  privacyRequests: defineTable({
+    userId: v.id("users"),
+    requestType: v.union(v.literal("export"), v.literal("correction"), v.literal("deletion")),
+    details: v.optional(v.string()),
+    status: v.union(v.literal("submitted"), v.literal("in_review"), v.literal("completed"), v.literal("rejected")),
+    externalDeletionStatus: v.optional(v.union(v.literal("not_required"), v.literal("pending"), v.literal("completed"))),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_user", ["userId"])
+    .index("by_status", ["status"]),
 
   users: defineTable({
     clerkId: v.string(),
@@ -200,5 +239,10 @@ export default defineSchema({
     ),
     createdAt: v.number(),
     updatedAt: v.number(),
+    privacyNoticeVersion: v.optional(v.string()),
+    privacyAcknowledgedAt: v.optional(v.number()),
+    aiProcessingAcknowledgedAt: v.optional(v.number()),
+    retentionReviewAt: v.optional(v.number()),
+    deletionRequestedAt: v.optional(v.number()),
   }).index("by_clerk_id", ["clerkId"]),
 });

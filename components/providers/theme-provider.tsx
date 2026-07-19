@@ -17,12 +17,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     const savedTheme = localStorage.getItem("wama-theme") as Theme | null;
     return savedTheme || "light";
   });
-  const [mounted, setMounted] = useState(false);
-
-  // Synchronize initial document classes and mark components as mounted
+  // Synchronize the document class with the selected theme.
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setMounted(true);
     if (theme === "dark") {
       document.documentElement.classList.add("dark");
     } else {

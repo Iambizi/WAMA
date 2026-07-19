@@ -24,7 +24,7 @@ export default function SellerDashboard() {
         </div>
         <h1 className="text-2xl font-bold tracking-tight mb-2">No Profile Found</h1>
         <p className="text-muted-foreground text-sm mb-6">
-          You haven't completed your Exit Readiness Intake yet. Start now to evaluate your readiness.
+          You haven&apos;t completed your Exit Readiness Intake yet. Start now to evaluate your readiness.
         </p>
         <Link
           href="/seller/intake"

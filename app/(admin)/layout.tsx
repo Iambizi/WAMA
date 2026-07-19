@@ -18,8 +18,6 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
         setIsSyncDelay(false);
       }, 1200);
       return () => clearTimeout(timer);
-    } else if (currentUser) {
-      setIsSyncDelay(false);
     }
   }, [currentUser]);
 

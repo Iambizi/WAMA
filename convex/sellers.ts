@@ -1,6 +1,50 @@
 import { v } from "convex/values";
 import { mutation, query, QueryCtx, MutationCtx } from "./_generated/server";
 import { requireAdvisor } from "./activityLogs";
+import { requireUser } from "./authz";
+import { assertCanCreateSelfProfile, assertCanEditSelfProfile } from "./onboarding";
+import {
+  ALLOWED_GEOGRAPHIES,
+  ALLOWED_SECTORS,
+  finiteNumber,
+  optionalText,
+  requiredText,
+  validEmail,
+  validPhone,
+} from "./securityValidation";
+
+const sellerSelfArgs = {
+  name: v.string(), email: v.string(), phone: v.optional(v.string()),
+  businessName: v.string(), sector: v.string(), geography: v.string(),
+  revenueRange: v.union(v.literal("under_500k"), v.literal("500k_1m"), v.literal("1m_3m"), v.literal("3m_5m"), v.literal("5m_10m"), v.literal("over_10m")),
+  ebitdaRange: v.union(v.literal("under_100k"), v.literal("100k_250k"), v.literal("250k_500k"), v.literal("500k_1m"), v.literal("over_1m")),
+  employeeCount: v.union(v.literal("1_5"), v.literal("6_15"), v.literal("16_50"), v.literal("51_plus")),
+  yearsInOperation: v.number(),
+  transactionType: v.union(v.literal("full_sale"), v.literal("majority"), v.literal("minority"), v.literal("succession")),
+  reasonForSale: v.string(),
+};
+
+type SellerSelfInput = {
+  name: string; email: string; phone?: string; businessName: string; sector: string;
+  geography: string; revenueRange: "under_500k" | "500k_1m" | "1m_3m" | "3m_5m" | "5m_10m" | "over_10m";
+  ebitdaRange: "under_100k" | "100k_250k" | "250k_500k" | "500k_1m" | "over_1m";
+  employeeCount: "1_5" | "6_15" | "16_50" | "51_plus"; yearsInOperation: number;
+  transactionType: "full_sale" | "majority" | "minority" | "succession"; reasonForSale: string;
+};
+
+function validateSellerInput(args: SellerSelfInput): SellerSelfInput {
+  if (!ALLOWED_SECTORS.includes(args.sector as typeof ALLOWED_SECTORS[number])) throw new Error("Sector is invalid");
+  if (!ALLOWED_GEOGRAPHIES.includes(args.geography as typeof ALLOWED_GEOGRAPHIES[number])) throw new Error("Geography is invalid");
+  return {
+    ...args,
+    name: requiredText(args.name, "Owner name", 120),
+    email: validEmail(args.email),
+    phone: validPhone(args.phone),
+    businessName: requiredText(args.businessName, "Business name", 160),
+    reasonForSale: requiredText(args.reasonForSale, "Reason for sale", 1_000),
+    yearsInOperation: finiteNumber(args.yearsInOperation, "Years in operation", 0, 500),
+  };
+}
 
 // Compute Document Readiness Score from the 5 boolean checklist flags
 function computeReadinessScore(args: {
@@ -36,25 +80,8 @@ export const list = query({
 export const get = query({
   args: { id: v.id("sellers") },
   handler: async (ctx: QueryCtx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) throw new Error("Unauthorized");
-
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_clerk_id", (q) => q.eq("clerkId", identity.subject))
-      .unique();
-
-    if (!user) throw new Error("Unauthorized");
-
-    const seller = await ctx.db.get(args.id);
-    if (!seller) return null;
-
-    // Admin can access all profiles; Sellers can only access their own linked profile
-    if (user.role !== "admin" && seller.userId !== user._id) {
-      throw new Error("Forbidden: Access denied");
-    }
-
-    return seller;
+    await requireAdvisor(ctx);
+    return await ctx.db.get(args.id);
   },
 });
 
@@ -72,10 +99,83 @@ export const currentSeller = query({
 
     if (!user) return null;
 
-    return await ctx.db
+    const seller = await ctx.db
       .query("sellers")
       .withIndex("by_user_id", (q) => q.eq("userId", user._id))
       .unique();
+    if (!seller || user.role !== "seller") return null;
+    return {
+      qualificationStatus: seller.qualificationStatus,
+      businessName: seller.businessName,
+      sector: seller.sector,
+      geography: seller.geography,
+      revenueRange: seller.revenueRange,
+      ebitdaRange: seller.ebitdaRange,
+      employeeCount: seller.employeeCount,
+      yearsInOperation: seller.yearsInOperation,
+      transactionType: seller.transactionType,
+      reasonForSale: seller.reasonForSale,
+      docFinancialsCpa: seller.docFinancialsCpa,
+      docFinancialsInterim: seller.docFinancialsInterim,
+      docAccountsReceivable: seller.docAccountsReceivable,
+      docAccountsPayable: seller.docAccountsPayable,
+      docEmployeeOrgChart: seller.docEmployeeOrgChart,
+      docExecutiveSalaries: seller.docExecutiveSalaries,
+    };
+  },
+});
+
+export const createSelf = mutation({
+  args: sellerSelfArgs,
+  handler: async (ctx: MutationCtx, args: SellerSelfInput) => {
+    const { identity, user } = await requireUser(ctx);
+    assertCanCreateSelfProfile(user, "seller");
+    const existing = await ctx.db.query("sellers").withIndex("by_user_id", (q) => q.eq("userId", user._id)).collect();
+    if (existing.length > 0) throw new Error("Seller profile already exists");
+    const fields = validateSellerInput(args);
+    const now = Date.now();
+    const id = await ctx.db.insert("sellers", {
+      ...fields,
+      userId: user._id,
+      dealDiscoveryMeeting: false,
+      dealNdaSigned: false,
+      dealDocumentsReceived: false,
+      dealPreliminaryAnalysisDone: false,
+      dealMandateProposal: false,
+      dealProposalSigned: false,
+      dealDocumentationReady: false,
+      docFinancialsCpa: false,
+      docFinancialsInterim: false,
+      docAccountsReceivable: false,
+      docAccountsPayable: false,
+      docEmployeeOrgChart: false,
+      docExecutiveSalaries: false,
+      qualificationStatus: "pending",
+      readinessScore: 0,
+      createdAt: now,
+      updatedAt: now,
+    });
+    await ctx.db.patch(user._id, { role: "seller", onboardingStatus: "submitted", updatedAt: now });
+    await ctx.db.insert("activityLogs", {
+      action: "seller_submitted", entityType: "seller", entityId: id,
+      entityLabel: "Seller profile", details: "Self-service onboarding submitted",
+      actorClerkId: identity.subject, actorUserId: user._id, actorRole: "seller",
+      outcome: "success", source: "ui", createdAt: now,
+    });
+    return id;
+  },
+});
+
+export const updateSelf = mutation({
+  args: { id: v.id("sellers"), ...sellerSelfArgs },
+  handler: async (ctx: MutationCtx, args: SellerSelfInput & { id: string & { __tableName: "sellers" } }) => {
+    const { user } = await requireUser(ctx);
+    assertCanEditSelfProfile(user, "seller");
+    const existing = await ctx.db.get(args.id);
+    if (!existing || existing.userId !== user._id) throw new Error("Forbidden");
+    const { id, ...input } = args;
+    await ctx.db.patch(id, { ...validateSellerInput(input), updatedAt: Date.now() });
+    return id;
   },
 });
 
@@ -163,48 +263,45 @@ export const create = mutation({
       notes?: string;
     }
   ) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) throw new Error("Unauthorized");
-
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_clerk_id", (q) => q.eq("clerkId", identity.subject))
-      .unique();
-
-    if (!user) throw new Error("Unauthorized");
-
-    const isAdmin = user.role === "admin";
-    const userIdToLink = isAdmin ? undefined : user._id;
+    const { identity, user } = await requireAdvisor(ctx);
 
     const now = Date.now();
     const readinessScore = computeReadinessScore(args);
 
     const id = await ctx.db.insert("sellers", {
-      ...args,
-      userId: userIdToLink,
+      ...validateSellerInput(args),
+      dealDiscoveryMeeting: args.dealDiscoveryMeeting,
+      dealNdaSigned: args.dealNdaSigned,
+      dealDocumentsReceived: args.dealDocumentsReceived,
+      dealPreliminaryAnalysisDone: args.dealPreliminaryAnalysisDone,
+      dealMandateProposal: args.dealMandateProposal,
+      dealProposalSigned: args.dealProposalSigned,
+      dealDocumentationReady: args.dealDocumentationReady,
+      docFinancialsCpa: args.docFinancialsCpa,
+      docFinancialsInterim: args.docFinancialsInterim,
+      docAccountsReceivable: args.docAccountsReceivable,
+      docAccountsPayable: args.docAccountsPayable,
+      docEmployeeOrgChart: args.docEmployeeOrgChart,
+      docExecutiveSalaries: args.docExecutiveSalaries,
+      notes: optionalText(args.notes, "Internal notes", 4_000),
       qualificationStatus: "pending",
       readinessScore,
       createdAt: now,
       updatedAt: now,
     });
 
-    // If a self-onboarding seller, update their registration role and status in users collection
-    if (!isAdmin) {
-      await ctx.db.patch(user._id, {
-        role: "seller",
-        onboardingIntent: "seller",
-        onboardingStatus: "submitted",
-        updatedAt: now,
-      });
-    }
-
     // Log the creation activity
     await ctx.db.insert("activityLogs", {
       action: "seller_created",
       entityType: "seller",
       entityId: id,
-      entityLabel: args.businessName,
-      details: isAdmin ? `Manually entered by Advisor (Readiness: ${readinessScore}%)` : `Submitted via self-onboarding portal (Readiness: ${readinessScore}%)`,
+      entityLabel: "Seller profile",
+      details: `Manually entered by advisor (Readiness: ${readinessScore}%)`,
+      actorClerkId: identity.subject,
+      actorUserId: user._id,
+      actorRole: "admin",
+      outcome: "success",
+      source: "ui",
       createdAt: now,
     });
 
@@ -298,15 +395,7 @@ export const update = mutation({
       notes?: string;
     }
   ) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) throw new Error("Unauthorized");
-
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_clerk_id", (q) => q.eq("clerkId", identity.subject))
-      .unique();
-
-    if (!user) throw new Error("Unauthorized");
+    const { identity, user } = await requireAdvisor(ctx);
 
     const { id, ...fields } = args;
     const now = Date.now();
@@ -316,15 +405,24 @@ export const update = mutation({
       throw new Error("Seller mandate not found");
     }
 
-    const isAdmin = user.role === "admin";
-    if (!isAdmin && existing.userId !== user._id) {
-      throw new Error("Forbidden: Access denied");
-    }
-
     const readinessScore = computeReadinessScore(fields);
 
     await ctx.db.patch(id, {
-      ...fields,
+      ...validateSellerInput(fields),
+      dealDiscoveryMeeting: fields.dealDiscoveryMeeting,
+      dealNdaSigned: fields.dealNdaSigned,
+      dealDocumentsReceived: fields.dealDocumentsReceived,
+      dealPreliminaryAnalysisDone: fields.dealPreliminaryAnalysisDone,
+      dealMandateProposal: fields.dealMandateProposal,
+      dealProposalSigned: fields.dealProposalSigned,
+      dealDocumentationReady: fields.dealDocumentationReady,
+      docFinancialsCpa: fields.docFinancialsCpa,
+      docFinancialsInterim: fields.docFinancialsInterim,
+      docAccountsReceivable: fields.docAccountsReceivable,
+      docAccountsPayable: fields.docAccountsPayable,
+      docEmployeeOrgChart: fields.docEmployeeOrgChart,
+      docExecutiveSalaries: fields.docExecutiveSalaries,
+      notes: optionalText(fields.notes, "Internal notes", 4_000),
       readinessScore,
       updatedAt: now,
     });
@@ -334,8 +432,13 @@ export const update = mutation({
       action: "seller_updated",
       entityType: "seller",
       entityId: id,
-      entityLabel: fields.businessName,
-      details: isAdmin ? `Updated profile by advisor (Readiness: ${readinessScore}%)` : `Updated profile by seller (Readiness: ${readinessScore}%)`,
+      entityLabel: "Seller profile",
+      details: `Updated profile by advisor (Readiness: ${readinessScore}%)`,
+      actorClerkId: identity.subject,
+      actorUserId: user._id,
+      actorRole: "admin",
+      outcome: "success",
+      source: "ui",
       createdAt: now,
     });
 
@@ -360,7 +463,7 @@ export const updateStatus = mutation({
       status: "pending" | "qualified" | "disqualified";
     }
   ) => {
-    await requireAdvisor(ctx);
+    const { identity, user } = await requireAdvisor(ctx);
     const now = Date.now();
 
     const existing = await ctx.db.get(args.id);
@@ -382,8 +485,13 @@ export const updateStatus = mutation({
       action: "seller_status_changed",
       entityType: "seller",
       entityId: args.id,
-      entityLabel: existing.businessName,
+      entityLabel: "Seller profile",
       details: `Status: ${existing.qualificationStatus} → ${args.status}`,
+      actorClerkId: identity.subject,
+      actorUserId: user._id,
+      actorRole: "admin",
+      outcome: "success",
+      source: "ui",
       createdAt: now,
     });
 

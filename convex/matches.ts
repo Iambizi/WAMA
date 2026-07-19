@@ -3,6 +3,20 @@ import { mutation, query, QueryCtx, MutationCtx } from "./_generated/server";
 import { requireAdvisor } from "./activityLogs";
 import { Id } from "./_generated/dataModel";
 
+type BuyerAccessStatus = "hidden" | "teaser_shared" | "nda_required" | "intro_approved" | "introduced";
+
+const ACCESS_TRANSITIONS: Record<BuyerAccessStatus, readonly BuyerAccessStatus[]> = {
+  hidden: ["hidden", "teaser_shared"],
+  teaser_shared: ["hidden", "teaser_shared", "nda_required"],
+  nda_required: ["hidden", "nda_required", "intro_approved"],
+  intro_approved: ["hidden", "intro_approved", "introduced"],
+  introduced: ["hidden", "introduced"],
+};
+
+export function assertAccessTransition(from: BuyerAccessStatus, to: BuyerAccessStatus): void {
+  if (!ACCESS_TRANSITIONS[from].includes(to)) throw new Error(`Invalid buyer access transition: ${from} → ${to}`);
+}
+
 // List all matches
 export const list = query({
   args: {},
@@ -139,7 +153,7 @@ export const logMatchGeneration = mutation({
       action: "match_generated",
       entityType: "seller",
       entityId: args.sellerId,
-      entityLabel: seller.businessName,
+      entityLabel: "Seller profile",
       details: `${args.matchCount} AI match recommendations generated`,
       createdAt: now,
     });
@@ -240,9 +254,18 @@ export const updateStatus = mutation({
       targetCloseDate?: number;
     }
   ) => {
-    await requireAdvisor(ctx);
+    const { identity, user } = await requireAdvisor(ctx);
     const existing = await ctx.db.get(args.id);
     if (!existing) throw new Error("Match recommendation not found");
+    const currentAccess = existing.buyerAccessStatus ?? "hidden";
+    const nextAccess = args.buyerAccessStatus ?? currentAccess;
+    assertAccessTransition(currentAccess, nextAccess);
+    if (nextAccess === "intro_approved" || nextAccess === "introduced") {
+      const buyerForAccess = await ctx.db.get(existing.buyerId);
+      if (!buyerForAccess || buyerForAccess.qualificationStatus !== "qualified" || !buyerForAccess.ndaSigned) {
+        throw new Error("Qualified buyer with verified NDA is required for this access level");
+      }
+    }
 
     const oldStatus = existing.status;
     const now = Date.now();
@@ -250,15 +273,11 @@ export const updateStatus = mutation({
     await ctx.db.patch(args.id, {
       status: args.status,
       advisorNotes: args.advisorNotes !== undefined ? args.advisorNotes : existing.advisorNotes,
-      buyerAccessStatus: args.buyerAccessStatus !== undefined ? args.buyerAccessStatus : (existing.buyerAccessStatus || "hidden"),
+      buyerAccessStatus: nextAccess,
       dealValue: args.dealValue !== undefined ? args.dealValue : existing.dealValue,
       targetCloseDate: args.targetCloseDate !== undefined ? args.targetCloseDate : existing.targetCloseDate,
       updatedAt: now,
     });
-
-    const buyer = await ctx.db.get(existing.buyerId);
-    const seller = await ctx.db.get(existing.sellerId);
-    const label = `${seller?.businessName || "Seller"} ↔ ${buyer?.name || "Buyer"}`;
 
     // Log the event based on transition
     let action = "match_stage_advanced";
@@ -272,8 +291,13 @@ export const updateStatus = mutation({
       action,
       entityType: "match",
       entityId: args.id,
-      entityLabel: label,
+      entityLabel: "Match record",
       details: `${oldStatus} → ${args.status}`,
+      actorClerkId: identity.subject,
+      actorUserId: user._id,
+      actorRole: "admin",
+      outcome: "success",
+      source: "ui",
       createdAt: now,
     });
 
@@ -300,37 +324,45 @@ export const listPopulatedForBuyer = query({
       .withIndex("by_user_id", (q) => q.eq("userId", user._id))
       .unique();
 
-    if (!buyer) return [];
+    if (!buyer || buyer.qualificationStatus !== "qualified") return [];
 
     const matches = await ctx.db
       .query("matches")
       .withIndex("by_buyer", (q) => q.eq("buyerId", buyer._id))
       .collect();
 
-    // Filter to matches where access status is NOT hidden
-    const visibleMatches = matches.filter(
-      (m) => m.buyerAccessStatus && m.buyerAccessStatus !== "hidden"
-    );
+    const visibleMatches = matches.filter((match) => {
+      if (!match.buyerAccessStatus || match.buyerAccessStatus === "hidden") return false;
+      if (
+        (match.buyerAccessStatus === "intro_approved" || match.buyerAccessStatus === "introduced") &&
+        !buyer.ndaSigned
+      ) return false;
+      return true;
+    });
 
-    // Populate de-identified seller details for buyer review
     const populated = await Promise.all(
       visibleMatches.map(async (m) => {
         const seller = await ctx.db.get(m.sellerId);
+        if (!seller) return null;
+        const base = {
+          sellerBusinessName: m.buyerAccessStatus === "introduced" ? seller.businessName : "Confidential Project",
+          sellerSector: seller.sector,
+          sellerGeography: seller.geography,
+          sellerRevenueRange: seller.revenueRange,
+          sellerTransactionType: seller.transactionType,
+          requiresNda: m.buyerAccessStatus === "nda_required",
+          canContactAdvisor: m.buyerAccessStatus === "intro_approved" || m.buyerAccessStatus === "introduced",
+        };
+        if (m.buyerAccessStatus === "teaser_shared" || m.buyerAccessStatus === "nda_required") return base;
         return {
-          ...m,
-          sellerBusinessName: "Confidential Project", // Exclude raw names to preserve anonymity
-          sellerSector: seller?.sector || "",
-          sellerGeography: seller?.geography || "",
-          sellerRevenueRange: seller?.revenueRange || "under_500k",
-          sellerEbitdaRange: seller?.ebitdaRange || "under_100k",
-          sellerEmployeeCount: seller?.employeeCount || "1_5",
-          sellerYearsInOperation: seller?.yearsInOperation ?? 0,
-          sellerTransactionType: seller?.transactionType || "full_sale",
-          sellerReasonForSale: seller?.reasonForSale || "",
+          ...base,
+          sellerEbitdaRange: seller.ebitdaRange,
+          sellerEmployeeCount: seller.employeeCount,
+          sellerYearsInOperation: seller.yearsInOperation,
+          ...(m.buyerAccessStatus === "introduced" ? { sellerReasonForSale: seller.reasonForSale } : {}),
         };
       })
     );
-
-    return populated;
+    return populated.filter((match) => match !== null);
   },
 });

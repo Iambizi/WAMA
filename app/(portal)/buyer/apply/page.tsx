@@ -9,7 +9,7 @@ import { Users } from "lucide-react";
 
 export default function BuyerApply() {
   const router = useRouter();
-  const createBuyer = useMutation(api.buyers.create);
+  const createBuyer = useMutation(api.buyers.createSelf);
   const updateIntent = useMutation(api.users.updateIntent);
   const currentBuyerProfile = useQuery(api.buyers.currentBuyer);
 
@@ -27,7 +27,9 @@ export default function BuyerApply() {
 
   const handleSubmit = async (values: BuyerFormValues) => {
     try {
-      await createBuyer(values);
+      const { proofOfFundsReviewed: _proof, ndaSigned: _nda, backgroundCheckComplete: _background, notes: _notes, ...selfFields } = values;
+      void _proof; void _nda; void _background; void _notes;
+      await createBuyer(selfFields);
       router.push("/buyer/dashboard");
     } catch (error) {
       console.error("Failed to submit buyer application:", error);
@@ -59,6 +61,7 @@ export default function BuyerApply() {
           onSubmit={handleSubmit}
           onCancel={() => router.push("/")}
           submitLabel="Submit Application"
+          selfService
         />
       </div>
     </div>

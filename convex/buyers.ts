@@ -1,6 +1,75 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import { requireAdvisor } from "./activityLogs";
+import { requireUser } from "./authz";
+import { assertCanCreateSelfProfile, assertCanEditSelfProfile } from "./onboarding";
+import {
+  ALLOWED_GEOGRAPHIES,
+  ALLOWED_SECTORS,
+  finiteNumber,
+  optionalFiniteNumber,
+  optionalText,
+  requiredText,
+  uniqueTextArray,
+  validEmail,
+  validPhone,
+} from "./securityValidation";
+
+const buyerSelfArgs = {
+  name: v.string(),
+  email: v.string(),
+  phone: v.optional(v.string()),
+  sectorInterest: v.array(v.string()),
+  budgetMin: v.number(),
+  budgetMax: v.number(),
+  geography: v.array(v.string()),
+  financingType: v.union(v.literal("cash"), v.literal("financed"), v.literal("mixed"), v.literal("vtb"), v.literal("mezzanine"), v.literal("equity_partner"), v.literal("unknown")),
+  acquisitionExperience: v.union(v.literal("first_time"), v.literal("experienced"), v.literal("serial")),
+  acquisitionTimeline: v.union(v.literal("0_6mo"), v.literal("6_12mo"), v.literal("12_24mo"), v.literal("24mo_plus")),
+  experienceDetail: v.optional(v.string()),
+  downPaymentAmount: v.optional(v.number()),
+  sourceOfFunds: v.optional(v.string()),
+  targetBusinessValue: v.optional(v.number()),
+  minEbitda: v.optional(v.number()),
+  minEmployees: v.optional(v.number()),
+  minTimeInBusiness: v.optional(v.number()),
+  clientConcentration: v.optional(v.string()),
+};
+
+type BuyerSelfInput = {
+  name: string; email: string; phone?: string; sectorInterest: string[];
+  budgetMin: number; budgetMax: number; geography: string[];
+  financingType: "cash" | "financed" | "mixed" | "vtb" | "mezzanine" | "equity_partner" | "unknown";
+  acquisitionExperience: "first_time" | "experienced" | "serial";
+  acquisitionTimeline: "0_6mo" | "6_12mo" | "12_24mo" | "24mo_plus";
+  experienceDetail?: string; downPaymentAmount?: number; sourceOfFunds?: string;
+  targetBusinessValue?: number; minEbitda?: number; minEmployees?: number;
+  minTimeInBusiness?: number; clientConcentration?: string;
+};
+
+function validateBuyerInput(args: BuyerSelfInput): BuyerSelfInput {
+  const budgetMin = finiteNumber(args.budgetMin, "Minimum budget", 0, 1_000_000_000);
+  const budgetMax = finiteNumber(args.budgetMax, "Maximum budget", 1, 1_000_000_000);
+  if (budgetMax <= budgetMin) throw new Error("Maximum budget must exceed minimum budget");
+  return {
+    ...args,
+    name: requiredText(args.name, "Name", 120),
+    email: validEmail(args.email),
+    phone: validPhone(args.phone),
+    sectorInterest: uniqueTextArray(args.sectorInterest, "Sector interests", ALLOWED_SECTORS),
+    geography: uniqueTextArray(args.geography, "Geographies", ALLOWED_GEOGRAPHIES),
+    budgetMin,
+    budgetMax,
+    experienceDetail: optionalText(args.experienceDetail, "Experience detail", 1_000),
+    sourceOfFunds: optionalText(args.sourceOfFunds, "Source of funds", 300),
+    clientConcentration: optionalText(args.clientConcentration, "Client concentration", 300),
+    downPaymentAmount: optionalFiniteNumber(args.downPaymentAmount, "Down payment", 0, 1_000_000_000),
+    targetBusinessValue: optionalFiniteNumber(args.targetBusinessValue, "Target value", 0, 1_000_000_000),
+    minEbitda: optionalFiniteNumber(args.minEbitda, "Minimum EBITDA", 0, 1_000_000_000),
+    minEmployees: optionalFiniteNumber(args.minEmployees, "Minimum employees", 0, 1_000_000),
+    minTimeInBusiness: optionalFiniteNumber(args.minTimeInBusiness, "Minimum time in business", 0, 500),
+  };
+}
 
 // List all buyers
 export const list = query({
@@ -15,25 +84,8 @@ export const list = query({
 export const get = query({
   args: { id: v.id("buyers") },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) throw new Error("Unauthorized");
-
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_clerk_id", (q) => q.eq("clerkId", identity.subject))
-      .unique();
-
-    if (!user) throw new Error("Unauthorized");
-
-    const buyer = await ctx.db.get(args.id);
-    if (!buyer) return null;
-
-    // Admin can access all profiles; Buyers can only access their own linked profile
-    if (user.role !== "admin" && buyer.userId !== user._id) {
-      throw new Error("Forbidden: Access denied");
-    }
-
-    return buyer;
+    await requireAdvisor(ctx);
+    return await ctx.db.get(args.id);
   },
 });
 
@@ -51,10 +103,77 @@ export const currentBuyer = query({
 
     if (!user) return null;
 
-    return await ctx.db
+    const buyer = await ctx.db
       .query("buyers")
       .withIndex("by_user_id", (q) => q.eq("userId", user._id))
       .unique();
+    if (!buyer || user.role !== "buyer") return null;
+    return {
+      qualificationStatus: buyer.qualificationStatus,
+      sectorInterest: buyer.sectorInterest,
+      budgetMin: buyer.budgetMin,
+      budgetMax: buyer.budgetMax,
+      geography: buyer.geography,
+      financingType: buyer.financingType,
+      acquisitionTimeline: buyer.acquisitionTimeline,
+    };
+  },
+});
+
+export const createSelf = mutation({
+  args: buyerSelfArgs,
+  handler: async (ctx, args: BuyerSelfInput) => {
+    const { identity, user } = await requireUser(ctx);
+    assertCanCreateSelfProfile(user, "buyer");
+    const existing = await ctx.db
+      .query("buyers")
+      .withIndex("by_user_id", (q) => q.eq("userId", user._id))
+      .collect();
+    if (existing.length > 0) throw new Error("Buyer profile already exists");
+    const fields = validateBuyerInput(args);
+    const now = Date.now();
+    const id = await ctx.db.insert("buyers", {
+      ...fields,
+      userId: user._id,
+      proofOfFundsReviewed: false,
+      ndaSigned: false,
+      backgroundCheckComplete: false,
+      qualificationStatus: "pending",
+      createdAt: now,
+      updatedAt: now,
+    });
+    await ctx.db.patch(user._id, {
+      role: "buyer",
+      onboardingStatus: "submitted",
+      updatedAt: now,
+    });
+    await ctx.db.insert("activityLogs", {
+      action: "buyer_submitted",
+      entityType: "buyer",
+      entityId: id,
+      entityLabel: "Buyer profile",
+      details: "Self-service onboarding submitted",
+      actorClerkId: identity.subject,
+      actorUserId: user._id,
+      actorRole: "buyer",
+      outcome: "success",
+      source: "ui",
+      createdAt: now,
+    });
+    return id;
+  },
+});
+
+export const updateSelf = mutation({
+  args: { id: v.id("buyers"), ...buyerSelfArgs },
+  handler: async (ctx, args: BuyerSelfInput & { id: string & { __tableName: "buyers" } }) => {
+    const { user } = await requireUser(ctx);
+    assertCanEditSelfProfile(user, "buyer");
+    const existing = await ctx.db.get(args.id);
+    if (!existing || existing.userId !== user._id) throw new Error("Forbidden");
+    const { id, ...input } = args;
+    await ctx.db.patch(id, { ...validateBuyerInput(input), updatedAt: Date.now() });
+    return id;
   },
 });
 
@@ -102,46 +221,33 @@ export const create = mutation({
     notes: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) throw new Error("Unauthorized");
-
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_clerk_id", (q) => q.eq("clerkId", identity.subject))
-      .unique();
-
-    if (!user) throw new Error("Unauthorized");
-
-    const isAdmin = user.role === "admin";
-    const userIdToLink = isAdmin ? undefined : user._id;
+    const { identity, user } = await requireAdvisor(ctx);
 
     const now = Date.now();
     
     const id = await ctx.db.insert("buyers", {
-      ...args,
-      userId: userIdToLink,
+      ...validateBuyerInput(args),
+      proofOfFundsReviewed: args.proofOfFundsReviewed,
+      ndaSigned: args.ndaSigned,
+      backgroundCheckComplete: args.backgroundCheckComplete,
+      notes: optionalText(args.notes, "Internal notes", 4_000),
       qualificationStatus: "pending",
       createdAt: now,
       updatedAt: now,
     });
-
-    // If a self-onboarding buyer, update their registration role and status in users collection
-    if (!isAdmin) {
-      await ctx.db.patch(user._id, {
-        role: "buyer",
-        onboardingIntent: "buyer",
-        onboardingStatus: "submitted",
-        updatedAt: now,
-      });
-    }
 
     // Log the creation
     await ctx.db.insert("activityLogs", {
       action: "buyer_created",
       entityType: "buyer",
       entityId: id,
-      entityLabel: args.name,
-      details: isAdmin ? `Manually entered by Advisor` : `Submitted via self-onboarding portal`,
+      entityLabel: "Buyer profile",
+      details: "Manually entered by advisor",
+      actorClerkId: identity.subject,
+      actorUserId: user._id,
+      actorRole: "admin",
+      outcome: "success",
+      source: "ui",
       createdAt: now,
     });
 
@@ -194,15 +300,7 @@ export const update = mutation({
     notes: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) throw new Error("Unauthorized");
-
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_clerk_id", (q) => q.eq("clerkId", identity.subject))
-      .unique();
-
-    if (!user) throw new Error("Unauthorized");
+    const { identity, user } = await requireAdvisor(ctx);
 
     const { id, ...fields } = args;
     const now = Date.now();
@@ -212,13 +310,12 @@ export const update = mutation({
       throw new Error("Buyer not found");
     }
 
-    const isAdmin = user.role === "admin";
-    if (!isAdmin && existing.userId !== user._id) {
-      throw new Error("Forbidden: Access denied");
-    }
-
     await ctx.db.patch(id, {
-      ...fields,
+      ...validateBuyerInput(fields),
+      proofOfFundsReviewed: fields.proofOfFundsReviewed,
+      ndaSigned: fields.ndaSigned,
+      backgroundCheckComplete: fields.backgroundCheckComplete,
+      notes: optionalText(fields.notes, "Internal notes", 4_000),
       updatedAt: now,
     });
 
@@ -227,8 +324,13 @@ export const update = mutation({
       action: "buyer_updated",
       entityType: "buyer",
       entityId: id,
-      entityLabel: args.name,
-      details: isAdmin ? "Profile fields updated by advisor" : "Profile fields updated by buyer user",
+      entityLabel: "Buyer profile",
+      details: "Profile fields updated by advisor",
+      actorClerkId: identity.subject,
+      actorUserId: user._id,
+      actorRole: "admin",
+      outcome: "success",
+      source: "ui",
       createdAt: now,
     });
 
@@ -247,7 +349,7 @@ export const updateStatus = mutation({
     ),
   },
   handler: async (ctx, args) => {
-    await requireAdvisor(ctx);
+    const { identity, user } = await requireAdvisor(ctx);
     const now = Date.now();
 
     const existing = await ctx.db.get(args.id);
@@ -269,8 +371,13 @@ export const updateStatus = mutation({
       action: "buyer_status_changed",
       entityType: "buyer",
       entityId: args.id,
-      entityLabel: existing.name,
+      entityLabel: "Buyer profile",
       details: `Status: ${existing.qualificationStatus} → ${args.status}`,
+      actorClerkId: identity.subject,
+      actorUserId: user._id,
+      actorRole: "admin",
+      outcome: "success",
+      source: "ui",
       createdAt: now,
     });
 

@@ -11,13 +11,9 @@ export function UserSyncProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (isLoaded && user) {
-      const email = user.emailAddresses[0]?.emailAddress;
-      const name = user.fullName || user.username || "";
-      if (email) {
-        syncUser({ email, name }).catch((err) => {
-          console.error("Error syncing user to Convex database:", err);
-        });
-      }
+      syncUser({}).catch(() => {
+        console.error("Unable to synchronize the authenticated account.");
+      });
     }
   }, [isLoaded, user, syncUser]);
 
